@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("CANDIDATE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  candidateProfile CandidateProfile?
+  companyProfile   CompanyProfile?
+
+  @@map("users")
+}
+
+model CandidateProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  currentTitle    String
+  industry        String
+  yearsExperience Int
+  achievements    String
+  salaryMin       Int
+  salaryMax       Int
+  locationPref    String
+  functionalFocus String
+
+  firstName      String?
+  lastName       String?
+  currentCompany String?
+  phone          String?
+  linkedinUrl    String?
+
+  status    String  @default("PENDING")
+  adminNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  matches Match[]
+
+  @@map("candidate_profiles")
+}
+
+model CompanyProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  companyName String
+  industry    String
+  size        String
+  description String
+  website     String?
+  isVerified  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  mandates Mandate[]
+
+  @@map("company_profiles")
+}
+
+model Mandate {
+  id        String         @id @default(cuid())
+  companyId String
+  company   CompanyProfile @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  title        String
+  industry     String
+  salaryMin    Int
+  salaryMax    Int
+  description  String
+  requirements String
+  isAnonymous  Boolean @default(false)
+  status       String  @default("DRAFT")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  matches Match[]
+
+  @@map("mandates")
+}
+
+model Match {
+  id                 String           @id @default(cuid())
+  mandateId          String
+  mandate            Mandate          @relation(fields: [mandateId], references: [id], onDelete: Cascade)
+  candidateProfileId String
+  candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+
+  score             Int
+  status            String   @default("PENDING")
+  candidateInterest Boolean  @default(false)
+  companyInterest   Boolean  @default(false)
+  revealedAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([mandateId, candidateProfileId])
+  @@map("matches")
+}
