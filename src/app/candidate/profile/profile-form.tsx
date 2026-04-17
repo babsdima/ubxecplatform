@@ -8,6 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { saveCandidateProfile, savePersonalInfo } from "@/lib/actions";
 import { useAction } from "@/hooks/use-action";
 
+const ENGAGEMENT_OPTIONS = [
+  { value: "full-time", label: "Найм в штат (full-time)" },
+  { value: "mentor", label: "Ментор" },
+  { value: "consultant", label: "Консультант / Advisor" },
+  { value: "board", label: "Advisory Board" },
+];
+
 type Profile = {
   currentTitle: string;
   functionalFocus: string;
@@ -17,6 +24,7 @@ type Profile = {
   salaryMin: number;
   salaryMax: number;
   locationPref: string;
+  engagementFormats: string;
   firstName: string | null;
   lastName: string | null;
   currentCompany: string | null;
@@ -86,6 +94,29 @@ export function CandidateProfileForm({ profile, userId }: { profile: Profile; us
               <Label htmlFor="locationPref">Локация</Label>
               <Input id="locationPref" name="locationPref" defaultValue={profile.locationPref} required />
             </div>
+
+            <div className="space-y-3">
+              <Label>Форматы взаимодействия</Label>
+              <p className="text-xs text-muted-foreground">Выберите один или несколько форматов, в которых вы готовы работать</p>
+              <div className="grid grid-cols-2 gap-2">
+                {ENGAGEMENT_OPTIONS.map(({ value, label }) => (
+                  <label
+                    key={value}
+                    className="flex items-center gap-2 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      name="engagementFormats"
+                      value={value}
+                      defaultChecked={profile.engagementFormats.split(",").includes(value)}
+                      className="h-4 w-4"
+                    />
+                    <span className="text-sm">{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <Button type="submit" className="w-full" disabled={saveProf.isPending}>
               {saveProf.isPending ? "Сохраняем..." : "Сохранить"}
             </Button>
