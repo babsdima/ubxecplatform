@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { computeMatches } from "../src/lib/matching";
 
 const prisma = new PrismaClient();
 
@@ -471,21 +472,15 @@ async function main() {
     },
   });
 
-  // Мэтчи
-  const cand1Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand1User.id } });
+  // Получаем профили кандидатов для демо-mutual мэтчей
   const cand2Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand2User.id } });
-  const cand3Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand3User.id } });
+  const cand6Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand6User.id } });
+  const cand10Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand10User.id } });
 
-  if (cand1Profile) {
-    await prisma.match.create({
-      data: { mandateId: mandate1.id, candidateProfileId: cand1Profile.id, score: 92, status: "PENDING" },
-    });
-  }
-  if (cand3Profile) {
-    await prisma.match.create({
-      data: { mandateId: mandate1.id, candidateProfileId: cand3Profile.id, score: 74, status: "PENDING" },
-    });
-  }
+  // Сначала удаляем все существующие мэтчи, чтобы пересчитать
+  await prisma.match.deleteMany({});
+
+  // Создаём демо-мэтчи с взаимным интересом (особое состояние — контакты открыты)
   if (cand2Profile) {
     await prisma.match.create({
       data: {
@@ -499,31 +494,6 @@ async function main() {
       },
     });
   }
-
-  // Дополнительные мэтчи
-  const cand6Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand6User.id } });
-  const cand9Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand9User.id } });
-  const cand10Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand10User.id } });
-
-  // COO на позицию COO в RetailCorp — отличный мэтч
-  if (cand3Profile) {
-    await prisma.match.create({
-      data: { mandateId: mandate3.id, candidateProfileId: cand3Profile.id, score: 89, status: "PENDING" },
-    });
-  }
-  // GM на позицию COO в RetailCorp — хороший мэтч
-  if (cand10Profile) {
-    await prisma.match.create({
-      data: { mandateId: mandate3.id, candidateProfileId: cand10Profile.id, score: 84, status: "PENDING", candidateInterest: true },
-    });
-  }
-  // CFO на позицию CFO в FinTechUp
-  if (cand1Profile) {
-    await prisma.match.create({
-      data: { mandateId: mandate4.id, candidateProfileId: cand1Profile.id, score: 78, status: "PENDING" },
-    });
-  }
-  // CEO (Соколов) — ментор для промышленного CEO — взаимный интерес
   if (cand6Profile) {
     await prisma.match.create({
       data: {
@@ -537,10 +507,33 @@ async function main() {
       },
     });
   }
-  // GM Морозов на Advisory Board в PE фонде
-  if (cand10Profile) {
-    await prisma.match.create({
-      data: { mandateId: mandate6.id, candidateProfileId: cand10Profile.id, score: 91, status: "PENDING", candidateInterest: true },
+
+  // Запускаем движок мэтчинга для всех активных мандатов
+  // (создаёт PENDING-мэтчи с реальными score + scoreBreakdown через upsert,
+  //  не затрагивая уже созданные MUTUAL)
+  console.log("Запуск AI-мэтчинга для всех активных мандатов...");
+  const activeMandates = [mandate1, mandate2, mandate3, mandate4, mandate5, mandate6];
+  for (const mandate of activeMandates) {
+    await computeMatches(mandate.id);
+  }
+
+  // Добавляем candidateInterest для демо (после compute — не перезапишет)
+  const cand10MatchM3 = await prisma.match.findFirst({
+    where: { mandateId: mandate3.id, candidate: { userId: cand10User.id } },
+  });
+  if (cand10MatchM3) {
+    await prisma.match.update({
+      where: { id: cand10MatchM3.id },
+      data: { candidateInterest: true },
+    });
+  }
+  const cand10MatchM6 = await prisma.match.findFirst({
+    where: { mandateId: mandate6.id, candidate: { userId: cand10User.id } },
+  });
+  if (cand10MatchM6) {
+    await prisma.match.update({
+      where: { id: cand10MatchM6.id },
+      data: { candidateInterest: true },
     });
   }
 

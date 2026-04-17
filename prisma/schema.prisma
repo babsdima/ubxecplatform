@@ -128,7 +128,8 @@ model Match {
   candidateProfileId String
   candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
 
-  score             Int
+  score          Int
+  scoreBreakdown String?  // JSON: { industry, role, salary, experience, format, location, assessment }
   status            String   @default("PENDING")
   candidateInterest Boolean  @default(false)
   companyInterest   Boolean  @default(false)

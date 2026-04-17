@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InterestButton } from "@/components/interest-button";
 import { CandidateNav } from "@/components/layout/candidate-nav";
 import { TabFilters } from "@/components/tab-filters";
+import { ScoreBreakdownWidget } from "@/components/score-breakdown";
 import { Suspense } from "react";
 
 const MANDATE_TYPE_LABEL: Record<string, string> = {
@@ -132,6 +133,7 @@ function MatchCard({
   match: {
     id: string;
     score: number;
+    scoreBreakdown: string | null;
     status: string;
     candidateInterest: boolean;
     companyInterest: boolean;
@@ -256,6 +258,8 @@ function MatchCard({
             <Badge variant="secondary">Вы отметили интерес</Badge>
           ) : null}
         </div>
+
+        <ScoreBreakdownWidget scoreBreakdown={match.scoreBreakdown} score={match.score} />
       </CardContent>
     </Card>
   );

@@ -234,6 +234,13 @@ export async function verifyCandidate(profileId: string, status: "VERIFIED" | "R
     where: { id: profileId },
     data: { status, adminNote: note || null },
   });
+
+  // После верификации — создаём мэтчи со всеми активными мандатами
+  if (status === "VERIFIED") {
+    const { computeMatchesForCandidate } = await import("./matching");
+    await computeMatchesForCandidate(profileId);
+  }
+
   revalidatePath("/admin/candidates");
   return {
     success: status === "VERIFIED" ? "Кандидат верифицирован" : "Профиль отклонён",

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { updateMandateStatus } from "@/lib/actions";
 import { InterestButton } from "@/components/interest-button";
 import { CompanyNav } from "@/components/layout/company-nav";
+import { ScoreBreakdownWidget } from "@/components/score-breakdown";
 
 const MANDATE_TYPE_LABEL: Record<string, string> = {
   "full-time": "Найм в штат",
@@ -195,6 +196,7 @@ function CandidateMatchCard({
   match: {
     id: string;
     score: number;
+    scoreBreakdown: string | null;
     status: string;
     candidateInterest: boolean;
     companyInterest: boolean;
@@ -374,6 +376,8 @@ function CandidateMatchCard({
             <Badge variant="secondary">Вы отметили интерес</Badge>
           ) : null}
         </div>
+
+        <ScoreBreakdownWidget scoreBreakdown={match.scoreBreakdown} score={match.score} />
       </CardContent>
     </Card>
   );
