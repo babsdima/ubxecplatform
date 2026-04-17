@@ -34,6 +34,21 @@ export default async function NewMandatePage() {
           <h1 className="text-2xl font-bold">Новая позиция</h1>
         </div>
 
+        {/* What happens after */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {[
+            { icon: "🤖", label: "AI-мэтчинг", desc: "Запускается сразу после публикации" },
+            { icon: "🔒", label: "Анонимность", desc: "Компания скрыта до взаимного интереса" },
+            { icon: "⚡", label: "Первые мэтчи", desc: "Появятся в течение нескольких минут" },
+          ].map(({ icon, label, desc }) => (
+            <div key={label} className="bg-background border rounded-lg p-3 text-center">
+              <div className="text-xl mb-1">{icon}</div>
+              <p className="font-medium text-sm">{label}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+            </div>
+          ))}
+        </div>
+
         <Card>
           <CardHeader>
             <CardTitle>Параметры позиции</CardTitle>
@@ -43,48 +58,12 @@ export default async function NewMandatePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Должность *</Label>
-                  <Input id="title" name="title" placeholder="CFO, CTO, COO..." required />
+                  <Input id="title" name="title" placeholder="CFO, CTO, COO, CEO..." required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="industry">Отрасль *</Label>
                   <Input id="industry" name="industry" placeholder="Финансы, Технологии..." required />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Вилка компенсации (руб/год) *</Label>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <Label htmlFor="salaryMin" className="text-xs text-muted-foreground">От</Label>
-                    <Input id="salaryMin" name="salaryMin" type="number" placeholder="10000000" required />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="salaryMax" className="text-xs text-muted-foreground">До</Label>
-                    <Input id="salaryMax" name="salaryMax" type="number" placeholder="20000000" required />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Описание позиции *</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  rows={4}
-                  placeholder="Задачи, контекст, что важно..."
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="requirements">Требования *</Label>
-                <Textarea
-                  id="requirements"
-                  name="requirements"
-                  rows={3}
-                  placeholder="Обязательный опыт, навыки, образование..."
-                  required
-                />
               </div>
 
               <div className="space-y-2">
@@ -99,17 +78,64 @@ export default async function NewMandatePage() {
                   <option value="consultant">Консультант / Part-time advisor</option>
                   <option value="board">Advisory Board</option>
                 </select>
+                <p className="text-xs text-muted-foreground">
+                  Влияет на мэтчинг — кандидаты видят только релевантные для своих форматов позиции
+                </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <input type="checkbox" id="isAnonymous" name="isAnonymous" className="h-4 w-4" />
-                <Label htmlFor="isAnonymous" className="cursor-pointer">
-                  Конфиденциальный поиск (компания скрыта до взаимного интереса)
-                </Label>
+              <div className="space-y-2">
+                <Label>Вилка компенсации (руб/год) *</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="salaryMin" className="text-xs text-muted-foreground">От</Label>
+                    <Input id="salaryMin" name="salaryMin" type="number" placeholder="10 000 000" required />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="salaryMax" className="text-xs text-muted-foreground">До</Label>
+                    <Input id="salaryMax" name="salaryMax" type="number" placeholder="20 000 000" required />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Описание позиции *</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  rows={4}
+                  placeholder="Задачи, контекст, команда, стадия компании..."
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="requirements">Требования к кандидату *</Label>
+                <Textarea
+                  id="requirements"
+                  name="requirements"
+                  rows={3}
+                  placeholder="Обязательный опыт, отраслевая экспертиза, навыки..."
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Чем конкретнее требования — тем выше качество мэтчей
+                </p>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-lg border bg-muted/30">
+                <input type="checkbox" id="isAnonymous" name="isAnonymous" className="h-4 w-4 mt-0.5" />
+                <div>
+                  <Label htmlFor="isAnonymous" className="cursor-pointer font-medium">
+                    Конфиденциальный поиск
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Название компании скрыто до взаимного интереса — кандидаты видят только индустрию и описание
+                  </p>
+                </div>
               </div>
 
               <Button type="submit" className="w-full" size="lg">
-                Опубликовать позицию и запустить мэтчинг
+                Опубликовать и запустить AI-мэтчинг
               </Button>
             </form>
           </CardContent>
