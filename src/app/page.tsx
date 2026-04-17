@@ -683,6 +683,7 @@ export default async function Home() {
             <Link href="/pricing" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Тарифы</Link>
             <Link href="/auth/login" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Войти</Link>
             <Link href="/auth/register" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Регистрация</Link>
+            <Link href="/agencies" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Для агентств</Link>
           </div>
         </div>
       </footer>
