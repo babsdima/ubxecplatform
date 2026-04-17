@@ -91,6 +91,160 @@
   color: rgba(255, 255, 255, 0.95);
 }
 
+/* ─── Premium Dashboard Theme ───────────────────────────────────────── */
+
+/* Page shell — light body */
+.dash-bg {
+  background: #F4F5F8;
+  min-height: 100vh;
+}
+
+/* Dark hero strip at the top of dashboard pages */
+.dash-hero {
+  background: hsl(222 47% 7%);
+  background-image: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(184,149,90,0.10), transparent);
+  position: relative;
+  padding-bottom: 3.5rem;
+}
+/* Smooth fade from dark hero into the light body */
+.dash-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: linear-gradient(to bottom, transparent, #F4F5F8);
+  pointer-events: none;
+}
+
+/* Cards that sit inside the dark hero strip */
+.pc-dark {
+  background: rgba(255,255,255,0.04);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+
+/* Dark nav — matches landing page */
+.pnav-dark {
+  background: hsl(222 47% 7%);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+/* Premium card — white, no harsh border, soft shadow */
+.pc {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 20, 40, 0.07);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+}
+
+/* Card with gold top accent */
+.pc-gold {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 20, 40, 0.07);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+  overflow: hidden;
+  position: relative;
+}
+.pc-gold::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, hsl(38 52% 48%) 0%, hsl(38 72% 68%) 100%);
+}
+
+/* Card with green top accent (mutual match) */
+.pc-green {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(22,163,74,0.06);
+  overflow: hidden;
+}
+.pc-green::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #16a34a, #4ade80);
+}
+
+/* Card with amber accent (awaiting action) */
+.pc-amber {
+  background: #fffbf5;
+  border-radius: 16px;
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(217,119,6,0.06);
+  overflow: hidden;
+}
+.pc-amber::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #d97706, #fbbf24);
+}
+
+/* Eyebrow label */
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+/* Large stat number */
+.stat-num {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-feature-settings: "tnum";
+}
+
+/* Premium badge — verified */
+.badge-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, hsl(38 52% 48%), hsl(38 72% 62%));
+  color: #fff;
+}
+
+/* Score circle */
+.score-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Premium nav */
+.pnav {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(15, 20, 40, 0.07);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
 /* Fade-in animation */
 @keyframes fadeUp {
   from {

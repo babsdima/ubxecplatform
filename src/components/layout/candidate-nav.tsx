@@ -3,14 +3,15 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { logoutAction } from "@/lib/actions";
 
-export async function CandidateNav({ active }: { active: "dashboard" | "matches" | "profile" | "services" | "assessment" }) {
+type ActiveTab = "dashboard" | "matches" | "profile" | "services" | "assessment";
+
+export async function CandidateNav({ active }: { active: ActiveTab }) {
   const session = await auth();
   if (!session) return null;
 
   const profile = await prisma.candidateProfile.findUnique({
     where: { userId: session.user.id },
     select: {
-      _count: false,
       matches: {
         where: { status: "MUTUAL", candidateInterest: true },
         select: { id: true },
@@ -18,10 +19,7 @@ export async function CandidateNav({ active }: { active: "dashboard" | "matches"
     },
   });
 
-  // Новые взаимные мэтчи (оба интереса, ещё не "просмотренные" — считаем все MUTUAL)
   const newMutual = profile?.matches.length ?? 0;
-
-  // Непросмотренные мэтчи — все где кандидат ещё не отметил интерес
   const pending = await prisma.match.count({
     where: {
       candidate: { userId: session.user.id },
@@ -30,54 +28,74 @@ export async function CandidateNav({ active }: { active: "dashboard" | "matches"
     },
   });
 
+  const avatarLetter = (session.user.email ?? "U")[0].toUpperCase();
+
+  const links: { href: string; label: string; tab: ActiveTab; badge?: number | boolean }[] = [
+    { href: "/candidate/dashboard", label: "Дашборд", tab: "dashboard" },
+    { href: "/candidate/matches", label: "Мэтчи", tab: "matches", badge: pending > 0 ? pending : newMutual > 0 ? true : undefined },
+    { href: "/candidate/profile", label: "Профиль", tab: "profile" },
+    { href: "/candidate/assessment", label: "Оценка", tab: "assessment" },
+    { href: "/candidate/services", label: "Услуги", tab: "services" },
+  ];
+
   return (
-    <header className="bg-background border-b sticky top-0 z-10">
-      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/candidate/dashboard" className="font-bold text-lg">UbXec</Link>
-        <nav className="flex gap-5 items-center">
-          <NavLink href="/candidate/dashboard" active={active === "dashboard"}>
-            Дашборд
-          </NavLink>
-          <NavLink href="/candidate/matches" active={active === "matches"}>
-            <span className="flex items-center gap-1.5">
-              Мэтчи
-              {pending > 0 && (
-                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold bg-primary text-primary-foreground leading-none">
-                  {pending > 9 ? "9+" : pending}
-                </span>
-              )}
-              {newMutual > 0 && pending === 0 && (
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
-              )}
-            </span>
-          </NavLink>
-          <NavLink href="/candidate/profile" active={active === "profile"}>
-            Профиль
-          </NavLink>
-          <NavLink href="/candidate/assessment" active={active === "assessment"}>
-            Оценка
-          </NavLink>
-          <NavLink href="/candidate/services" active={active === "services"}>
-            Услуги
-          </NavLink>
+    <header className="pnav-dark">
+      <div className="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between gap-6">
+        {/* Logo */}
+        <Link
+          href="/candidate/dashboard"
+          className="font-bold text-xl tracking-tight shrink-0"
+          style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+        >
+          Ub<span style={{ color: "hsl(38 52% 55%)" }}>X</span>ec
+        </Link>
+
+        {/* Nav links */}
+        <nav className="flex items-center gap-0.5 flex-1">
+          {links.map(({ href, label, tab, badge }) => {
+            const isActive = active === tab;
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+                  isActive
+                    ? "text-white bg-white/10"
+                    : "text-white/50 hover:text-white/90 hover:bg-white/06"
+                }`}
+              >
+                {label}
+                {badge !== undefined && (
+                  typeof badge === "number" ? (
+                    <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold leading-none"
+                      style={{ background: "hsl(38 52% 55%)", color: "#fff" }}>
+                      {badge > 9 ? "9+" : badge}
+                    </span>
+                  ) : (
+                    <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
+                  )
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Right: logout + avatar */}
+        <div className="flex items-center gap-3 shrink-0">
           <form action={logoutAction}>
-            <button type="submit" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <button
+              type="submit"
+              className="text-xs font-medium nav-ghost-link transition-colors"
+            >
               Выйти
             </button>
           </form>
-        </nav>
+          <div className="w-8 h-8 rounded-full text-sm font-semibold flex items-center justify-center select-none"
+            style={{ background: "rgba(255,255,255,0.12)", color: "hsl(40 33% 90%)", border: "1px solid rgba(255,255,255,0.15)" }}>
+            {avatarLetter}
+          </div>
+        </div>
       </div>
     </header>
-  );
-}
-
-function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className={`text-sm transition-colors ${active ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-    >
-      {children}
-    </Link>
   );
 }

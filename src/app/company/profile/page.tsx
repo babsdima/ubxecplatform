@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { CompanyProfileForm } from "./profile-form";
 import { CompanyNav } from "@/components/layout/company-nav";
-import { Badge } from "@/components/ui/badge";
 
 export default async function CompanyProfilePage() {
   const session = await auth();
@@ -15,24 +14,45 @@ export default async function CompanyProfilePage() {
   if (!company) redirect("/company/onboarding");
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="dash-bg">
       <CompanyNav active="profile" />
-      <main className="max-w-2xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Профиль компании</h1>
+
+      {/* Dark header */}
+      <div className="dash-hero">
+        <div className="max-w-2xl mx-auto px-5 pt-10 pb-2 relative z-10 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold tracking-widest uppercase mb-2"
+              style={{ color: "hsl(38 52% 55%)" }}>Компания</p>
+            <h1
+              className="text-3xl font-bold tracking-tight"
+              style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+            >
+              Профиль компании
+            </h1>
+          </div>
           {company.isVerified ? (
-            <Badge>Верифицирована</Badge>
+            <span className="badge-verified mb-1 shrink-0">Верифицирована</span>
           ) : (
-            <Badge variant="secondary">Ожидает верификации</Badge>
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-full shrink-0 mb-1"
+              style={{ background: "rgba(217,119,6,0.15)", color: "hsl(38 72% 70%)", border: "1px solid rgba(217,119,6,0.3)" }}>
+              На проверке
+            </span>
           )}
         </div>
+      </div>
+
+      <main className="max-w-2xl mx-auto px-5 pt-6 pb-10 -mt-2">
         {!company.isVerified && (
-          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
-            <strong>Верификация в процессе.</strong> Команда UbXec проверит информацию о компании в течение 24 часов.
-            Это не блокирует создание позиций и мэтчинг.
+          <div className="mb-6 pc-amber p-4 pl-5">
+            <p className="text-sm text-amber-800 font-medium">
+              <strong>Верификация в процессе.</strong> Команда UbXec проверит информацию о компании в течение 24 часов.
+              Это не блокирует создание позиций и мэтчинг.
+            </p>
           </div>
         )}
-        <CompanyProfileForm company={company} userId={session.user.id} />
+        <div className="pc p-6">
+          <CompanyProfileForm company={company} userId={session.user.id} />
+        </div>
       </main>
     </div>
   );

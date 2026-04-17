@@ -1,26 +1,25 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InterestButton } from "@/components/interest-button";
 import { CandidateNav } from "@/components/layout/candidate-nav";
 import { TabFilters } from "@/components/tab-filters";
 import { ScoreBreakdownWidget } from "@/components/score-breakdown";
 import { Suspense } from "react";
+import { CheckCircle2, Lock } from "lucide-react";
 
 const MANDATE_TYPE_LABEL: Record<string, string> = {
   "full-time": "Найм в штат",
-  mentor: "Ментор",
-  consultant: "Консультант / Advisor",
-  board: "Advisory Board",
+  mentor:      "Ментор",
+  consultant:  "Консультант",
+  board:       "Advisory Board",
 };
 
 const MANDATE_TYPE_COLOR: Record<string, string> = {
-  "full-time": "bg-blue-50 text-blue-700 border-blue-200",
-  mentor: "bg-purple-50 text-purple-700 border-purple-200",
-  consultant: "bg-orange-50 text-orange-700 border-orange-200",
-  board: "bg-teal-50 text-teal-700 border-teal-200",
+  "full-time": "bg-slate-100 text-slate-600",
+  mentor:      "bg-violet-50 text-violet-600",
+  consultant:  "bg-blue-50 text-blue-600",
+  board:       "bg-amber-50 text-amber-700",
 };
 
 export default async function CandidateMatches({
@@ -60,44 +59,58 @@ export default async function CandidateMatches({
 
   const filtered = (() => {
     switch (filter) {
-      case "mutual":
-        return allMatches.filter((m) => m.status === "MUTUAL");
-      case "interested":
-        return allMatches.filter((m) => m.candidateInterest && m.status !== "MUTUAL");
-      case "new":
-        return allMatches.filter((m) => !m.candidateInterest && m.status !== "MUTUAL");
-      default:
-        return allMatches;
+      case "mutual":     return allMatches.filter((m) => m.status === "MUTUAL");
+      case "interested": return allMatches.filter((m) => m.candidateInterest && m.status !== "MUTUAL");
+      case "new":        return allMatches.filter((m) => !m.candidateInterest && m.status !== "MUTUAL");
+      default:           return allMatches;
     }
   })();
 
   const counts = {
-    all: allMatches.length,
-    new: allMatches.filter((m) => !m.candidateInterest && m.status !== "MUTUAL").length,
+    all:       allMatches.length,
+    new:       allMatches.filter((m) => !m.candidateInterest && m.status !== "MUTUAL").length,
     interested: allMatches.filter((m) => m.candidateInterest && m.status !== "MUTUAL").length,
-    mutual: allMatches.filter((m) => m.status === "MUTUAL").length,
+    mutual:    allMatches.filter((m) => m.status === "MUTUAL").length,
   };
 
   const tabs = [
-    { value: "", label: "Все", count: counts.all },
-    { value: "new", label: "Новые", count: counts.new },
-    { value: "interested", label: "Интерес отмечен", count: counts.interested },
-    { value: "mutual", label: "Взаимные", count: counts.mutual },
+    { value: "",           label: "Все",              count: counts.all },
+    { value: "new",        label: "Новые",            count: counts.new },
+    { value: "interested", label: "Интерес отмечен",  count: counts.interested },
+    { value: "mutual",     label: "Взаимные",         count: counts.mutual },
   ];
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="dash-bg">
       <CandidateNav active="matches" />
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Мои мэтчи</h1>
+      {/* Dark page header */}
+      <div className="dash-hero">
+        <div className="max-w-5xl mx-auto px-5 pt-10 pb-2 relative z-10 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold tracking-widest uppercase mb-2"
+              style={{ color: "hsl(38 52% 55%)" }}>Кандидат</p>
+            <h1
+              className="text-3xl font-bold tracking-tight"
+              style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+            >
+              Мои мэтчи
+            </h1>
+            <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+              {counts.all} позиций · {counts.mutual} взаимных
+            </p>
+          </div>
           {counts.mutual > 0 && (
-            <span className="text-sm text-green-700 bg-green-50 border border-green-200 px-3 py-1 rounded-full font-medium">
-              {counts.mutual} взаимных — контакты открыты
+            <span className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full font-medium shrink-0"
+              style={{ background: "rgba(22,163,74,0.15)", color: "#4ade80", border: "1px solid rgba(22,163,74,0.3)" }}>
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              {counts.mutual} взаимных
             </span>
           )}
         </div>
+      </div>
+
+      <main className="max-w-5xl mx-auto px-5 pt-6 pb-10 -mt-2">
 
         {allMatches.length > 0 && (
           <Suspense>
@@ -106,17 +119,15 @@ export default async function CandidateMatches({
         )}
 
         {filtered.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center text-muted-foreground">
-              {profile.status !== "VERIFIED"
-                ? "Мэтчи появятся после верификации вашего профиля"
-                : filter
-                ? "Нет мэтчей в этой категории"
-                : "Мэтчей пока нет. Мы уведомим вас, когда появятся релевантные позиции"}
-            </CardContent>
-          </Card>
+          <div className="pc p-12 text-center text-slate-500">
+            {profile.status !== "VERIFIED"
+              ? "Мэтчи появятся после верификации вашего профиля"
+              : filter
+              ? "Нет мэтчей в этой категории"
+              : "Мэтчей пока нет. Мы уведомим вас, когда появятся релевантные позиции"}
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 mt-4">
             {filtered.map((match) => (
               <MatchCard key={match.id} match={match} />
             ))}
@@ -161,59 +172,76 @@ function MatchCard({
   const alreadyInterested = match.candidateInterest;
   const companyAlsoInterested = match.companyInterest;
   const typeLabel = MANDATE_TYPE_LABEL[match.mandate.mandateType] ?? match.mandate.mandateType;
-  const typeColor = MANDATE_TYPE_COLOR[match.mandate.mandateType] ?? "bg-muted text-muted-foreground border";
+  const typeColor = MANDATE_TYPE_COLOR[match.mandate.mandateType] ?? "bg-slate-100 text-slate-600";
 
   const companyName = isMutual || !match.mandate.isAnonymous
     ? match.mandate.company.companyName
     : null;
 
-  return (
-    <Card className={isMutual ? "border-green-400 shadow-sm" : ""}>
-      <CardHeader className="flex flex-row items-start justify-between pb-3">
-        <div className="flex-1 min-w-0 pr-4">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
-            <CardTitle className="text-lg">{match.mandate.title}</CardTitle>
-            <span className={`text-xs px-2 py-0.5 rounded border font-medium ${typeColor}`}>
-              {typeLabel}
-            </span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {companyName ?? "Компания скрыта до взаимного интереса"}
-            {" · "}
-            {match.mandate.industry}
-          </p>
-        </div>
-        <div className="flex flex-col items-end gap-1.5 shrink-0">
-          <span className="text-2xl font-bold text-primary">{match.score}%</span>
-          <span className="text-[10px] text-muted-foreground">совпадение</span>
-        </div>
-      </CardHeader>
+  const scoreColor =
+    match.score >= 80 ? "text-green-600" :
+    match.score >= 60 ? "text-slate-800" :
+    match.score >= 40 ? "text-amber-600" :
+    "text-slate-400";
 
-      <CardContent className="space-y-4">
-        {/* Mutual reveal banner */}
-        {isMutual && (
-          <div className="bg-green-50 border border-green-300 rounded-lg p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-green-600 text-lg">✓</span>
-              <p className="font-semibold text-green-800">Взаимный интерес — контакты открыты</p>
-              <Badge className="bg-green-600 text-xs ml-auto">Взаимный</Badge>
+  return (
+    <div className={isMutual ? "pc-green" : "pc"}>
+      <div className="p-6">
+        {/* Header row */}
+        <div className="flex items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${typeColor}`}>
+                {typeLabel}
+              </span>
+              {match.mandate.isAnonymous && !isMutual && (
+                <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium">
+                  <Lock className="w-2.5 h-2.5" />
+                  Анонимно
+                </span>
+              )}
+              {isMutual && (
+                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-100">
+                  Взаимный
+                </span>
+              )}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <h3 className="text-base font-semibold text-slate-900 leading-snug">{match.mandate.title}</h3>
+            <p className="text-sm text-slate-500 mt-0.5">
+              {companyName ?? "Компания скрыта до взаимного интереса"}
+              <span className="mx-1.5 text-slate-300">·</span>
+              {match.mandate.industry}
+            </p>
+          </div>
+          <div className="shrink-0 text-right">
+            <p className={`text-2xl font-bold tabular-nums leading-none ${scoreColor}`}>{match.score}%</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">совпадение</p>
+          </div>
+        </div>
+
+        {/* Mutual reveal */}
+        {isMutual && (
+          <div className="mt-5 pt-5 border-t border-green-100 space-y-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-green-600" />
+              <p className="text-sm font-semibold text-green-800">Взаимный интерес — контакты открыты</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <p className="text-xs text-green-700 uppercase tracking-wide mb-1">Компания</p>
-                <p className="font-medium text-green-900">{match.mandate.company.companyName}</p>
-                <p className="text-green-700 text-xs mt-0.5">
+                <p className="eyebrow mb-1">Компания</p>
+                <p className="text-sm font-semibold text-slate-800">{match.mandate.company.companyName}</p>
+                <p className="text-xs text-slate-500 mt-0.5">
                   {match.mandate.company.size} · {match.mandate.company.industry}
                 </p>
               </div>
               {match.mandate.company.website && (
                 <div>
-                  <p className="text-xs text-green-700 uppercase tracking-wide mb-1">Сайт</p>
+                  <p className="eyebrow mb-1">Сайт</p>
                   <a
                     href={match.mandate.company.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-green-800 underline underline-offset-2 hover:text-green-600 text-sm break-all"
+                    className="text-sm text-slate-700 underline underline-offset-2 hover:text-slate-900 break-all"
                   >
                     {match.mandate.company.website}
                   </a>
@@ -222,45 +250,49 @@ function MatchCard({
             </div>
             {match.mandate.company.description && (
               <div>
-                <p className="text-xs text-green-700 uppercase tracking-wide mb-1">О компании</p>
-                <p className="text-sm text-green-800">{match.mandate.company.description}</p>
+                <p className="eyebrow mb-1">О компании</p>
+                <p className="text-sm text-slate-700 leading-relaxed">{match.mandate.company.description}</p>
               </div>
             )}
           </div>
         )}
 
-        {/* Company interest hint (not mutual yet) */}
+        {/* Company interest hint */}
         {companyAlsoInterested && !isMutual && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-sm text-amber-800 flex items-center gap-2">
-            <span>🔥</span>
-            <span><strong>Компания отметила интерес.</strong> Отметьте взаимно, чтобы открыть контакты.</span>
+          <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 text-sm text-amber-800 flex items-center gap-2">
+            <span className="text-base">🔥</span>
+            <span><strong>Компания уже отметила интерес.</strong> Отметьте взаимно, чтобы открыть контакты.</span>
           </div>
         )}
 
-        <p className="text-sm text-muted-foreground">{match.mandate.description}</p>
+        {/* Description */}
+        <p className="text-sm text-slate-600 leading-relaxed mt-4">{match.mandate.description}</p>
 
         {/* Requirements */}
         {match.mandate.requirements && (
-          <div className="bg-muted/50 rounded-lg p-3">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1.5">Требования</p>
-            <p className="text-sm">{match.mandate.requirements}</p>
+          <div className="mt-3 bg-slate-50 rounded-xl p-3.5">
+            <p className="eyebrow mb-1.5">Требования</p>
+            <p className="text-sm text-slate-700 leading-relaxed">{match.mandate.requirements}</p>
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-1 border-t">
-          <p className="text-sm text-muted-foreground">
+        {/* Footer */}
+        <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between gap-4">
+          <p className="text-sm font-medium text-slate-600">
             {(match.mandate.salaryMin / 1_000_000).toFixed(1)}–
             {(match.mandate.salaryMax / 1_000_000).toFixed(1)} млн руб/год
           </p>
           {!alreadyInterested && !isMutual ? (
             <InterestButton matchId={match.id} role="candidate" />
           ) : alreadyInterested && !isMutual ? (
-            <Badge variant="secondary">Вы отметили интерес</Badge>
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-100 text-slate-500">
+              Интерес отмечен
+            </span>
           ) : null}
         </div>
 
         <ScoreBreakdownWidget scoreBreakdown={match.scoreBreakdown} score={match.score} />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

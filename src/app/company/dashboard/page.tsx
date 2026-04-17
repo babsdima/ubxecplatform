@@ -2,18 +2,48 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CompanyNav } from "@/components/layout/company-nav";
-import { ArrowRight, Plus, Building2, CreditCard, Settings } from "lucide-react";
+import { ArrowRight, Plus, Building2, CreditCard, Settings, CheckCircle2 } from "lucide-react";
 
 const MANDATE_TYPE_LABEL: Record<string, string> = {
   "full-time": "Найм в штат",
-  mentor: "Ментор",
-  consultant: "Консультант",
-  board: "Advisory Board",
+  mentor:      "Ментор",
+  consultant:  "Консультант",
+  board:       "Advisory Board",
 };
+
+const MANDATE_TYPE_COLOR: Record<string, string> = {
+  "full-time": "bg-slate-100 text-slate-600",
+  mentor:      "bg-violet-50 text-violet-600",
+  consultant:  "bg-blue-50 text-blue-600",
+  board:       "bg-amber-50 text-amber-700",
+};
+
+function StatCard({
+  value,
+  label,
+  color,
+  href,
+  pulse,
+}: {
+  value: number;
+  label: string;
+  color?: string;
+  href: string;
+  pulse?: boolean;
+}) {
+  return (
+    <Link href={href} className="block group">
+      <div className="pc p-6 h-full transition-all duration-200 group-hover:shadow-[0_2px_8px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.06)] group-hover:-translate-y-0.5">
+        <p className={`stat-num ${color ?? "text-slate-800"}`}>{value}</p>
+        <p className="text-sm text-slate-500 mt-1.5 font-medium">{label}</p>
+        <p className={`text-xs text-slate-400 mt-2 flex items-center gap-1 transition-opacity ${pulse ? "opacity-100 text-slate-600" : "opacity-0 group-hover:opacity-100"}`}>
+          Открыть <ArrowRight className="w-3 h-3" />
+        </p>
+      </div>
+    </Link>
+  );
+}
 
 export default async function CompanyDashboard() {
   const session = await auth();
@@ -40,7 +70,6 @@ export default async function CompanyDashboard() {
     0
   );
 
-  // Кандидаты с интересом, ждущие ответа компании
   const awaitingAction = company.mandates.flatMap((m) =>
     m.matches
       .filter((x) => x.candidateInterest && !x.companyInterest && x.status !== "MUTUAL")
@@ -48,178 +77,224 @@ export default async function CompanyDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="dash-bg">
       <CompanyNav active="dashboard" />
 
-      <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">{company.companyName}</h1>
-            <p className="text-muted-foreground text-sm">{company.industry} · {company.size}</p>
+      {/* ── Dark hero strip ─────────────────────────────────────────────── */}
+      <div className="dash-hero">
+        <div className="max-w-5xl mx-auto px-5 pt-10 relative z-10">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold tracking-widest uppercase mb-2"
+                style={{ color: "hsl(38 52% 55%)" }}>
+                {company.industry} · {company.size}
+              </p>
+              <h1
+                className="text-3xl font-bold tracking-tight leading-snug"
+                style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+              >
+                {company.companyName}
+              </h1>
+              {company.website && (
+                <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  {company.website}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-2 shrink-0 mt-1">
+              {company.isVerified ? (
+                <span className="badge-verified">Верифицирована</span>
+              ) : (
+                <span className="text-xs font-semibold px-3 py-1.5 rounded-full"
+                  style={{ background: "rgba(217,119,6,0.15)", color: "hsl(38 72% 70%)", border: "1px solid rgba(217,119,6,0.3)" }}>
+                  На проверке
+                </span>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            {company.isVerified && <Badge>Верифицирована</Badge>}
-            <Button asChild size="sm">
-              <Link href="/company/mandates/new">+ Новая позиция</Link>
-            </Button>
+
+          {company.description && (
+            <div className="mt-5 pt-5" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+              <p className="text-xs font-bold tracking-widest uppercase mb-2"
+                style={{ color: "rgba(255,255,255,0.25)" }}>
+                О компании
+              </p>
+              <p className="text-sm leading-relaxed line-clamp-2" style={{ color: "rgba(255,255,255,0.55)" }}>
+                {company.description}
+              </p>
+            </div>
+          )}
+
+          <div className="mt-6 flex items-center gap-3">
+            <Link
+              href="/company/mandates/new"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+              style={{ background: "hsl(38 52% 55%)", color: "#fff" }}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Новая позиция
+            </Link>
+            <Link
+              href="/company/mandates"
+              className="inline-flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+              style={{ border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.65)", background: "rgba(255,255,255,0.04)" }}
+            >
+              Все позиции
+            </Link>
           </div>
         </div>
+      </div>
+
+      <main className="max-w-5xl mx-auto px-5 pb-10 space-y-8 -mt-2">
 
         {/* Urgent: awaiting action */}
         {awaitingAction.length > 0 && (
-          <Card className="border-amber-300 bg-amber-50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base text-amber-800 flex items-center gap-2">
-                <span>🔥</span>
-                {awaitingAction.length === 1
-                  ? "1 кандидат ждёт вашего ответа"
-                  : `${awaitingAction.length} кандидата ждут вашего ответа`}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {awaitingAction.slice(0, 3).map((item) => (
-                  <div key={item.id} className="flex items-center justify-between">
-                    <p className="text-sm text-amber-800">
-                      Позиция: <strong>{item.mandateTitle}</strong>
-                    </p>
-                    <Button variant="outline" size="sm" className="h-7 text-xs border-amber-400 text-amber-700 hover:bg-amber-100" asChild>
-                      <Link href={`/company/mandates/${item.mandateId}`}>Посмотреть</Link>
-                    </Button>
-                  </div>
-                ))}
-                {awaitingAction.length > 3 && (
-                  <p className="text-xs text-amber-700">+{awaitingAction.length - 3} ещё</p>
-                )}
+          <div className="pc-amber p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-amber-800 mb-2">
+                  {awaitingAction.length === 1
+                    ? "1 кандидат заинтересован — ждёт вашего ответа"
+                    : `${awaitingAction.length} кандидата заинтересованы — ждут вашего ответа`}
+                </p>
+                <div className="space-y-1.5">
+                  {awaitingAction.slice(0, 3).map((item) => (
+                    <div key={item.id} className="flex items-center justify-between gap-4">
+                      <p className="text-sm text-amber-700">
+                        Позиция: <strong>{item.mandateTitle}</strong>
+                      </p>
+                      <Link
+                        href={`/company/mandates/${item.mandateId}`}
+                        className="text-xs font-semibold text-amber-700 border border-amber-300 rounded-lg px-3 py-1 hover:bg-amber-100 transition-colors shrink-0"
+                      >
+                        Посмотреть
+                      </Link>
+                    </div>
+                  ))}
+                  {awaitingAction.length > 3 && (
+                    <p className="text-xs text-amber-600 mt-1">+{awaitingAction.length - 3} ещё</p>
+                  )}
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Mutual matches banner */}
         {mutualMatches > 0 && (
-          <div className="bg-green-50 border border-green-300 rounded-lg px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-green-800">
-              <span className="text-lg">✓</span>
+          <div className="pc-green p-5 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5 text-sm text-green-800">
+              <CheckCircle2 className="w-4.5 h-4.5 text-green-600 shrink-0" />
               <span>
                 <strong>{mutualMatches} взаимных мэтча</strong> — контакты кандидатов открыты
               </span>
             </div>
-            <Button variant="outline" size="sm" className="border-green-400 text-green-700 hover:bg-green-100 text-xs h-7" asChild>
-              <Link href="/company/mandates">Перейти к позициям</Link>
-            </Button>
+            <Link
+              href="/company/mandates"
+              className="text-xs font-semibold text-green-700 border border-green-300 rounded-lg px-3 py-1.5 hover:bg-green-100 transition-colors shrink-0"
+            >
+              Перейти к позициям
+            </Link>
           </div>
         )}
 
-        {/* Stat cards */}
+        {/* Stat tiles */}
         <div className="grid grid-cols-4 gap-4">
-          {[
-            { href: "/company/mandates", value: totalMandates, label: "Позиций", color: "" },
-            { href: "/company/mandates?filter=ACTIVE", value: activeM, label: "Активных", color: "text-primary" },
-            { href: "/company/mandates", value: totalMatches, label: "Мэтчей всего", color: "" },
-            { href: "/company/mandates", value: mutualMatches, label: "Взаимных", color: "text-green-600" },
-          ].map(({ href, value, label, color }) => (
-            <Link key={label} href={href} className="block group">
-              <Card className="h-full transition-shadow group-hover:shadow-md">
-                <CardContent className="pt-6 text-center">
-                  <p className={`text-3xl font-bold ${color}`}>{value}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{label}</p>
-                  <p className="text-xs text-primary mt-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                    Смотреть <ArrowRight className="w-3 h-3" />
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+          <StatCard value={totalMandates} label="Позиций всего"   href="/company/mandates" />
+          <StatCard value={activeM}       label="Активных"         href="/company/mandates?filter=ACTIVE" color={activeM > 0 ? "text-slate-900" : undefined} />
+          <StatCard value={totalMatches}  label="Мэтчей всего"    href="/company/mandates" />
+          <StatCard value={mutualMatches} label="Взаимных"         href="/company/mandates" color="text-green-600" pulse={mutualMatches > 0} />
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        {/* Mandates list + Quick actions */}
+        <div className="grid md:grid-cols-3 gap-5">
+
           {/* Mandates list */}
-          <div className="md:col-span-2">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Последние позиции</CardTitle>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/company/mandates">Все позиции</Link>
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {company.mandates.length === 0 ? (
-                  <div className="py-8 text-center space-y-3">
-                    <p className="text-muted-foreground text-sm">Пока нет позиций.</p>
-                    <Button asChild>
-                      <Link href="/company/mandates/new">Создать первую позицию</Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                    {company.mandates.map((m) => {
-                      const candidateInterest = m.matches.filter(
-                        (x) => x.candidateInterest && !x.companyInterest && x.status !== "MUTUAL"
-                      ).length;
-                      const mutual = m.matches.filter((x) => x.status === "MUTUAL").length;
-                      return (
-                        <Link
-                          key={m.id}
-                          href={`/company/mandates/${m.id}`}
-                          className="flex items-center justify-between py-2.5 px-2 rounded-lg hover:bg-muted transition-colors border-b last:border-0"
-                        >
-                          <div className="min-w-0">
-                            <p className="font-medium text-sm truncate">{m.title}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              {MANDATE_TYPE_LABEL[m.mandateType] ?? m.mandateType}
-                              {" · "}
-                              {m.matches.length} мэтчей
-                              {candidateInterest > 0 && (
-                                <span className="text-amber-600 font-medium"> · {candidateInterest} ждут ответа</span>
-                              )}
-                              {mutual > 0 && (
-                                <span className="text-green-600 font-medium"> · {mutual} взаимных</span>
-                              )}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2 ml-3 shrink-0">
-                            <Badge variant={m.status === "ACTIVE" ? "default" : "secondary"} className="text-xs">
-                              {m.status === "ACTIVE" ? "Активен" : m.status === "DRAFT" ? "Черновик" : "Закрыт"}
-                            </Badge>
-                            <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+          <div className="md:col-span-2 pc overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-50">
+              <p className="text-sm font-semibold text-slate-800">Последние позиции</p>
+              <Link href="/company/mandates" className="text-xs text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 transition-colors">
+                Все позиции <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            {company.mandates.length === 0 ? (
+              <div className="py-12 text-center space-y-3 px-6">
+                <p className="text-slate-500 text-sm">Пока нет позиций.</p>
+                <Link
+                  href="/company/mandates/new"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Создать первую позицию
+                </Link>
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-50">
+                {company.mandates.map((m) => {
+                  const candidateInterest = m.matches.filter(
+                    (x) => x.candidateInterest && !x.companyInterest && x.status !== "MUTUAL"
+                  ).length;
+                  const mutual = m.matches.filter((x) => x.status === "MUTUAL").length;
+                  const typeColor = MANDATE_TYPE_COLOR[m.mandateType] ?? "bg-slate-100 text-slate-600";
+                  return (
+                    <Link
+                      key={m.id}
+                      href={`/company/mandates/${m.id}`}
+                      className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/60 transition-colors group"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-slate-800 truncate">{m.title}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold mr-1.5 ${typeColor}`}>
+                            {MANDATE_TYPE_LABEL[m.mandateType] ?? m.mandateType}
+                          </span>
+                          {m.matches.length} мэтчей
+                          {candidateInterest > 0 && (
+                            <span className="text-amber-600 font-medium"> · {candidateInterest} ждут ответа</span>
+                          )}
+                          {mutual > 0 && (
+                            <span className="text-green-600 font-medium"> · {mutual} взаимных</span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2.5 ml-4 shrink-0">
+                        <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${
+                          m.status === "ACTIVE"
+                            ? "bg-green-50 text-green-700 border border-green-100"
+                            : m.status === "DRAFT"
+                            ? "bg-slate-100 text-slate-500"
+                            : "bg-red-50 text-red-500"
+                        }`}>
+                          {m.status === "ACTIVE" ? "Активен" : m.status === "DRAFT" ? "Черновик" : "Закрыт"}
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Quick actions */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Действия</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1">
-              {[
-                { href: "/company/mandates/new", icon: Plus, label: "Новая позиция" },
-                { href: "/company/mandates", icon: Building2, label: "Все позиции" },
-                { href: "/company/profile", icon: Settings, label: "Профиль компании" },
-                { href: "/pricing", icon: CreditCard, label: "Тарифы" },
-              ].map(({ href, icon: Icon, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="flex items-center justify-between p-2.5 rounded-lg hover:bg-muted transition-colors group"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{label}</span>
-                  </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
-              ))}
-            </CardContent>
-          </Card>
+          <div className="pc p-6 space-y-1">
+            <p className="eyebrow mb-4">Быстрые действия</p>
+            {[
+              { href: "/company/mandates/new", icon: Plus,      label: "Новая позиция" },
+              { href: "/company/mandates",     icon: Building2, label: "Все позиции" },
+              { href: "/company/profile",      icon: Settings,  label: "Профиль компании" },
+              { href: "/pricing",              icon: CreditCard, label: "Тарифы" },
+            ].map(({ href, icon: Icon, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-slate-600 font-medium hover:bg-slate-50 hover:text-slate-900 transition-all group"
+              >
+                <Icon className="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" />
+                <span className="truncate">{label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </main>
     </div>

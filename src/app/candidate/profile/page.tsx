@@ -3,12 +3,11 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { CandidateProfileForm } from "./profile-form";
 import { CandidateNav } from "@/components/layout/candidate-nav";
-import { Badge } from "@/components/ui/badge";
 
-const statusLabel: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  PENDING: { label: "На верификации", variant: "secondary" },
-  VERIFIED: { label: "Верифицирован", variant: "default" },
-  REJECTED: { label: "Отклонён", variant: "destructive" },
+const STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
+  PENDING:  { label: "На верификации", cls: "bg-amber-50 text-amber-700 border border-amber-200" },
+  VERIFIED: { label: "Верифицирован",  cls: "badge-verified" },
+  REJECTED: { label: "Отклонён",       cls: "bg-red-50 text-red-600 border border-red-200" },
 };
 
 export default async function CandidateProfile() {
@@ -20,22 +19,42 @@ export default async function CandidateProfile() {
   });
   if (!profile) redirect("/candidate/onboarding");
 
-  const status = statusLabel[profile.status] ?? { label: profile.status, variant: "outline" as const };
+  const statusCfg = STATUS_CONFIG[profile.status] ?? { label: profile.status, cls: "bg-slate-100 text-slate-600" };
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="dash-bg">
       <CandidateNav active="profile" />
-      <main className="max-w-2xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Профиль</h1>
-          <Badge variant={status.variant}>{status.label}</Badge>
+
+      {/* Dark header */}
+      <div className="dash-hero">
+        <div className="max-w-2xl mx-auto px-5 pt-10 pb-2 relative z-10 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold tracking-widest uppercase mb-2"
+              style={{ color: "hsl(38 52% 55%)" }}>Кандидат</p>
+            <h1
+              className="text-3xl font-bold tracking-tight"
+              style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+            >
+              Профиль
+            </h1>
+          </div>
+          <span className={`text-xs font-semibold px-3 py-1.5 rounded-full shrink-0 mb-1 ${statusCfg.cls}`}>
+            {statusCfg.label}
+          </span>
         </div>
+      </div>
+
+      <main className="max-w-2xl mx-auto px-5 pt-6 pb-10 -mt-2">
         {profile.status === "REJECTED" && profile.adminNote && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-800">
-            <strong>Причина отклонения:</strong> {profile.adminNote}
+          <div className="mb-6 pc p-4 border-l-2 border-red-400">
+            <p className="text-sm text-red-700 font-medium">
+              <strong>Причина отклонения:</strong> {profile.adminNote}
+            </p>
           </div>
         )}
-        <CandidateProfileForm profile={profile} userId={session.user.id} />
+        <div className="pc p-6">
+          <CandidateProfileForm profile={profile} userId={session.user.id} />
+        </div>
       </main>
     </div>
   );

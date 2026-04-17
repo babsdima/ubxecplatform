@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { CandidateNav } from "@/components/layout/candidate-nav";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   MessageCircle,
   FileText,
@@ -116,67 +113,87 @@ export default async function CandidateServicesPage() {
   if (!session) redirect("/auth/login");
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="dash-bg">
       <CandidateNav active="services" />
 
-      <main className="max-w-5xl mx-auto px-4 py-10 space-y-10">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold">Дополнительные услуги</h1>
-          <p className="text-muted-foreground text-sm max-w-2xl">
-            Инструменты для тех, кто хочет выйти на рынок подготовленным — с правильным профилем,
-            ясной стратегией и конкурентным пониманием своей стоимости.
+      {/* Dark header */}
+      <div className="dash-hero">
+        <div className="max-w-5xl mx-auto px-5 pt-10 pb-2 relative z-10">
+          <p className="text-xs font-bold tracking-widest uppercase mb-2"
+            style={{ color: "hsl(38 52% 55%)" }}>Кандидат</p>
+          <h1
+            className="text-3xl font-bold tracking-tight"
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+          >
+            Дополнительные услуги
+          </h1>
+          <p className="text-sm mt-1 leading-relaxed max-w-2xl" style={{ color: "rgba(255,255,255,0.4)" }}>
+            Инструменты для тех, кто хочет выйти на рынок подготовленным
           </p>
         </div>
+      </div>
 
+      <main className="max-w-5xl mx-auto px-5 pt-6 pb-10 space-y-6 -mt-2">
+
+        {/* Service cards */}
         <div className="grid md:grid-cols-2 gap-5">
           {services.map((s) => {
             const Icon = s.icon;
             return (
-              <Card key={s.title} className="flex flex-col">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <Badge variant="secondary" className="text-xs">{s.tag}</Badge>
+              <div key={s.title} className="pc p-6 flex flex-col group hover:shadow-[0_2px_8px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-200">
+                {/* Card header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-slate-600" />
                   </div>
-                  <CardTitle className="text-base mt-3">{s.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">{s.description}</p>
-                </CardHeader>
-                <CardContent className="flex flex-col flex-1 space-y-4">
-                  <ul className="space-y-1.5 flex-1">
-                    {s.benefits.map((b) => (
-                      <li key={b} className="text-sm flex items-start gap-2">
-                        <span className="text-primary mt-0.5">·</span>
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <span className="font-semibold text-sm">{s.price}</span>
-                    <Button size="sm" variant="outline" asChild>
-                      <a href="mailto:support@ubxec.ru">{s.cta}</a>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500">
+                    {s.tag}
+                  </span>
+                </div>
+
+                <h3 className="text-base font-semibold text-slate-900 mb-1">{s.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed flex-1">{s.description}</p>
+
+                {/* Benefits */}
+                <ul className="mt-4 space-y-1.5">
+                  {s.benefits.map((b) => (
+                    <li key={b} className="text-sm text-slate-600 flex items-start gap-2">
+                      <span className="text-slate-300 mt-0.5 shrink-0">·</span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-50">
+                  <span className="text-base font-bold text-slate-900">{s.price}</span>
+                  <a
+                    href="mailto:support@ubxec.ru"
+                    className="text-xs font-semibold px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                  >
+                    {s.cta}
+                  </a>
+                </div>
+              </div>
             );
           })}
         </div>
 
-        <Card className="bg-primary/5 border-primary/20">
-          <CardContent className="pt-5 flex items-start justify-between gap-4">
-            <div>
-              <p className="font-medium">Нужна индивидуальная программа?</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Свяжитесь с командой UbXec — составим пакет под ваши задачи и временной горизонт.
-              </p>
-            </div>
-            <Button variant="outline" size="sm" asChild className="shrink-0">
-              <a href="mailto:support@ubxec.ru">Написать нам</a>
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Custom package CTA */}
+        <div className="pc p-6 flex items-center justify-between gap-6">
+          <div>
+            <p className="text-sm font-semibold text-slate-800">Нужна индивидуальная программа?</p>
+            <p className="text-sm text-slate-500 mt-0.5">
+              Свяжитесь с командой UbXec — составим пакет под ваши задачи и временной горизонт.
+            </p>
+          </div>
+          <a
+            href="mailto:support@ubxec.ru"
+            className="shrink-0 text-sm font-semibold px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+          >
+            Написать нам
+          </a>
+        </div>
       </main>
     </div>
   );

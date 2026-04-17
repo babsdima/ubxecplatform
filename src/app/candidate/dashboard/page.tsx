@@ -2,92 +2,53 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CandidateNav } from "@/components/layout/candidate-nav";
 import { SalaryBenchmark } from "@/components/salary-benchmark";
-import { ArrowRight, FileText, Sparkles, ShieldCheck, BarChart2, Star } from "lucide-react";
+import { ArrowRight, FileText, Sparkles, Star, BarChart2, CheckCircle2, Circle } from "lucide-react";
 
-const statusLabel: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  PENDING: { label: "На верификации", variant: "secondary" },
-  VERIFIED: { label: "Верифицирован", variant: "default" },
-  REJECTED: { label: "Отклонён", variant: "destructive" },
+const STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
+  PENDING:  { label: "На верификации", cls: "bg-amber-50 text-amber-700 border border-amber-200" },
+  VERIFIED: { label: "Верифицирован",  cls: "badge-verified" },
+  REJECTED: { label: "Отклонён",       cls: "bg-red-50 text-red-600 border border-red-200" },
 };
 
-const MANDATE_TYPE_LABEL: Record<string, string> = {
+const FORMAT_LABEL: Record<string, string> = {
   "full-time": "Найм в штат",
-  mentor: "Ментор",
-  consultant: "Консультант",
-  board: "Advisory Board",
+  mentor:      "Ментор",
+  consultant:  "Консультант",
+  board:       "Advisory Board",
 };
 
-function ProfileCompleteness({
-  profile,
-  assessmentsCount,
-}: {
-  profile: {
-    phone: string | null;
-    linkedinUrl: string | null;
-    currentCompany: string | null;
-    firstName: string | null;
-    status: string;
-  };
-  assessmentsCount: number;
-}) {
-  const steps = [
-    { label: "Профиль заполнен", done: true },
-    { label: "Имя и фамилия", done: !!profile.firstName },
-    { label: "Телефон", done: !!profile.phone },
-    { label: "LinkedIn", done: !!profile.linkedinUrl },
-    { label: "Текущая компания", done: !!profile.currentCompany },
-    { label: "Assessment пройден", done: assessmentsCount > 0 },
-    { label: "Профиль верифицирован", done: profile.status === "VERIFIED" },
-  ];
-  const done = steps.filter((s) => s.done).length;
-  const pct = Math.round((done / steps.length) * 100);
+const MATCH_TYPE_LABEL: Record<string, string> = {
+  "full-time": "Найм",
+  mentor:      "Ментор",
+  consultant:  "Консультант",
+  board:       "Board",
+};
 
+function StatCard({
+  value,
+  label,
+  color,
+  href,
+  pulse,
+}: {
+  value: number;
+  label: string;
+  color?: string;
+  href: string;
+  pulse?: boolean;
+}) {
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-medium">Заполненность профиля</CardTitle>
-          <span className="text-sm font-semibold text-primary">{pct}%</span>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-full transition-all"
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-1">
-          {steps.map(({ label, done }) => (
-            <div key={label} className="flex items-center gap-1.5 text-xs">
-              <span className={done ? "text-green-600" : "text-muted-foreground"}>
-                {done ? "✓" : "○"}
-              </span>
-              <span className={done ? "text-foreground" : "text-muted-foreground"}>{label}</span>
-            </div>
-          ))}
-        </div>
-        {pct < 100 && (
-          <div className="flex gap-2 pt-1">
-            {!profile.firstName && (
-              <Button variant="outline" size="sm" asChild className="text-xs h-7">
-                <Link href="/candidate/profile">Добавить контакты</Link>
-              </Button>
-            )}
-            {assessmentsCount === 0 && (
-              <Button variant="outline" size="sm" asChild className="text-xs h-7">
-                <Link href="/candidate/assessment">Пройти оценку</Link>
-              </Button>
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <Link href={href} className="block group">
+      <div className="pc p-6 h-full transition-all duration-200 group-hover:shadow-[0_2px_8px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.06)] group-hover:-translate-y-0.5">
+        <p className={`stat-num ${color ?? "text-slate-800"}`}>{value}</p>
+        <p className="text-sm text-slate-500 mt-1.5 font-medium">{label}</p>
+        <p className={`text-xs text-slate-400 mt-2 flex items-center gap-1 transition-opacity ${pulse ? "opacity-100 text-slate-600" : "opacity-0 group-hover:opacity-100"}`}>
+          Открыть <ArrowRight className="w-3 h-3" />
+        </p>
+      </div>
+    </Link>
   );
 }
 
@@ -101,165 +62,214 @@ export default async function CandidateDashboard() {
       matches: {
         include: { mandate: { include: { company: true } } },
         orderBy: { score: "desc" },
-        take: 3,
+        take: 4,
       },
       assessments: { where: { status: "COMPLETED" } },
     },
   });
-
   if (!profile) redirect("/candidate/onboarding");
 
-  const status = statusLabel[profile.status] ?? { label: profile.status, variant: "outline" as const };
-
-  const allMatchesCount = await prisma.match.count({ where: { candidateProfileId: profile.id } });
-  const mutualCount = await prisma.match.count({ where: { candidateProfileId: profile.id, status: "MUTUAL" } });
-  const newCount = await prisma.match.count({
+  const allCount  = await prisma.match.count({ where: { candidateProfileId: profile.id } });
+  const mutual    = await prisma.match.count({ where: { candidateProfileId: profile.id, status: "MUTUAL" } });
+  const newCount  = await prisma.match.count({
     where: { candidateProfileId: profile.id, candidateInterest: false, status: { not: "MUTUAL" } },
   });
 
-  const engagementFormats = profile.engagementFormats
-    ? profile.engagementFormats.split(",").map((f) => MANDATE_TYPE_LABEL[f] ?? f)
-    : [];
+  const statusCfg = STATUS_CONFIG[profile.status] ?? { label: profile.status, cls: "bg-slate-100 text-slate-600" };
+  const formats = profile.engagementFormats?.split(",").map((f) => FORMAT_LABEL[f] ?? f) ?? [];
+
+  // Profile completeness
+  const steps = [
+    { label: "Профиль заполнен",   done: true },
+    { label: "Имя и фамилия",      done: !!profile.firstName },
+    { label: "Телефон",            done: !!profile.phone },
+    { label: "LinkedIn",           done: !!profile.linkedinUrl },
+    { label: "Текущая компания",   done: !!profile.currentCompany },
+    { label: "Assessment",         done: profile.assessments.length > 0 },
+    { label: "Верификация",        done: profile.status === "VERIFIED" },
+  ];
+  const doneCount = steps.filter((s) => s.done).length;
+  const pct = Math.round((doneCount / steps.length) * 100);
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="dash-bg">
       <CandidateNav active="dashboard" />
 
-      <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-        {profile.status === "PENDING" && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3">
-            <span className="text-amber-500 mt-0.5">⏳</span>
-            <div className="text-sm text-amber-800">
-              <strong>Профиль на проверке.</strong> Команда UbXec верифицирует профиль в течение 24 часов.
-              После верификации вы получите мэтчи с релевантными позициями.
-            </div>
-          </div>
-        )}
-        {profile.status === "REJECTED" && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-            <span className="text-red-500 mt-0.5">✗</span>
-            <div className="text-sm text-red-800">
-              <strong>Профиль отклонён.</strong> {profile.adminNote ?? "Обратитесь к команде поддержки."}
-            </div>
-          </div>
-        )}
+      {/* ── Dark hero strip ─────────────────────────────────────────────── */}
+      <div className="dash-hero">
+        <div className="max-w-5xl mx-auto px-5 pt-10 relative z-10">
 
-        {/* Profile card */}
-        <Card>
-          <CardHeader className="flex flex-row items-start justify-between">
-            <div>
-              <CardTitle className="text-xl">{profile.currentTitle}</CardTitle>
-              <p className="text-muted-foreground text-sm mt-1">
-                {profile.industry} · {profile.yearsExperience} лет опыта
+          {/* Status banners */}
+          {profile.status === "PENDING" && (
+            <div className="mb-5 rounded-xl border px-4 py-3"
+              style={{ background: "rgba(217,119,6,0.12)", borderColor: "rgba(217,119,6,0.3)" }}>
+              <p className="text-sm font-medium" style={{ color: "hsl(38 72% 72%)" }}>
+                Профиль на проверке — команда UbXec верифицирует его в течение 24 часов.
               </p>
             </div>
-            <Badge variant={status.variant}>{status.label}</Badge>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Ключевые достижения</p>
-              <p className="text-sm">{profile.achievements}</p>
+          )}
+          {profile.status === "REJECTED" && (
+            <div className="mb-5 rounded-xl border px-4 py-3"
+              style={{ background: "rgba(220,38,38,0.12)", borderColor: "rgba(220,38,38,0.3)" }}>
+              <p className="text-sm font-medium text-red-300">
+                Профиль отклонён. {profile.adminNote ?? "Обратитесь к команде поддержки."}
+              </p>
             </div>
-            <div className="grid grid-cols-3 gap-4 text-sm">
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">Компенсация</p>
-                <p>{(profile.salaryMin / 1_000_000).toFixed(1)}–{(profile.salaryMax / 1_000_000).toFixed(1)} млн руб/год</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">Локация</p>
-                <p>{profile.locationPref}</p>
-              </div>
-              {engagementFormats.length > 0 && (
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Форматы</p>
-                  <div className="flex flex-wrap gap-1">
-                    {engagementFormats.map((f) => (
-                      <span key={f} className="text-xs bg-muted px-1.5 py-0.5 rounded">{f}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+          )}
 
-        {/* Stat cards */}
-        <div className="grid grid-cols-3 gap-4">
-          <Link href="/candidate/matches" className="block group">
-            <Card className="h-full transition-shadow group-hover:shadow-md">
-              <CardContent className="pt-6 text-center">
-                <p className="text-3xl font-bold">{allMatchesCount}</p>
-                <p className="text-sm text-muted-foreground mt-1">Мэтчей всего</p>
-                <p className="text-xs text-primary mt-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                  Смотреть <ArrowRight className="w-3 h-3" />
+          {/* Profile hero — dark style */}
+          <div>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold tracking-widest uppercase mb-2"
+                  style={{ color: "hsl(38 52% 55%)" }}>
+                  {profile.industry} · {profile.yearsExperience} лет опыта
                 </p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/candidate/matches?filter=mutual" className="block group">
-            <Card className="h-full transition-shadow group-hover:shadow-md">
-              <CardContent className="pt-6 text-center">
-                <p className="text-3xl font-bold text-green-600">{mutualCount}</p>
-                <p className="text-sm text-muted-foreground mt-1">Взаимный интерес</p>
-                <p className="text-xs text-primary mt-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                  Смотреть <ArrowRight className="w-3 h-3" />
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link href="/candidate/matches?filter=new" className="block group">
-            <Card className="h-full transition-shadow group-hover:shadow-md">
-              <CardContent className="pt-6 text-center">
-                <p className={`text-3xl font-bold ${newCount > 0 ? "text-primary" : ""}`}>{newCount}</p>
-                <p className="text-sm text-muted-foreground mt-1">Новых мэтчей</p>
-                {newCount > 0 && (
-                  <p className="text-xs text-primary mt-2 flex items-center justify-center gap-1 animate-pulse">
-                    Посмотреть <ArrowRight className="w-3 h-3" />
+                <h1
+                  className="text-3xl font-bold tracking-tight leading-snug"
+                  style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+                >
+                  {profile.firstName
+                    ? `${profile.firstName} ${profile.lastName ?? ""}`.trim()
+                    : profile.currentTitle}
+                </h1>
+                {profile.firstName && (
+                  <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>
+                    {profile.currentTitle}
                   </p>
                 )}
-              </CardContent>
-            </Card>
-          </Link>
+              </div>
+              <span className={`text-xs font-semibold px-3 py-1.5 rounded-full shrink-0 ${statusCfg.cls}`}>
+                {statusCfg.label}
+              </span>
+            </div>
+
+            <div className="mt-5 pt-5" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+              <p className="text-xs font-bold tracking-widest uppercase mb-2"
+                style={{ color: "rgba(255,255,255,0.25)" }}>
+                Ключевые достижения
+              </p>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
+                {profile.achievements}
+              </p>
+            </div>
+
+            <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm"
+              style={{ color: "rgba(255,255,255,0.55)" }}>
+              <span className="font-medium" style={{ color: "rgba(255,255,255,0.8)" }}>
+                {(profile.salaryMin / 1_000_000).toFixed(1)}–{(profile.salaryMax / 1_000_000).toFixed(1)} млн руб/год
+              </span>
+              <span style={{ color: "rgba(255,255,255,0.2)" }}>·</span>
+              <span>{profile.locationPref}</span>
+              {formats.length > 0 && (
+                <>
+                  <span style={{ color: "rgba(255,255,255,0.2)" }}>·</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {formats.map((f) => (
+                      <span key={f} className="text-xs px-2 py-0.5 rounded-full font-medium"
+                        style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.65)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <main className="max-w-5xl mx-auto px-5 pb-10 space-y-8 -mt-2">
+
+        {/* Stat tiles */}
+        <div className="grid grid-cols-3 gap-4">
+          <StatCard value={allCount}  label="Мэтчей всего"    href="/candidate/matches"             />
+          <StatCard value={mutual}    label="Взаимных"         href="/candidate/matches?filter=mutual" color="text-green-600" />
+          <StatCard value={newCount}  label="Новых"            href="/candidate/matches?filter=new"    color={newCount > 0 ? "text-slate-900" : undefined} pulse={newCount > 0} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Two-column: completeness + assessments */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
           {/* Profile completeness */}
-          <ProfileCompleteness profile={profile} assessmentsCount={profile.assessments.length} />
+          <div className="pc p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-slate-800">Заполненность профиля</p>
+              <span className="text-sm font-bold" style={{ color: "hsl(38 52% 48%)" }}>{pct}%</span>
+            </div>
+            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${pct}%`, background: "linear-gradient(90deg, hsl(38 52% 48%), hsl(38 72% 62%))" }}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-y-2 gap-x-4">
+              {steps.map(({ label, done }) => (
+                <div key={label} className="flex items-center gap-2">
+                  {done
+                    ? <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                    : <Circle className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+                  }
+                  <span className={`text-xs ${done ? "text-slate-700" : "text-slate-400"}`}>{label}</span>
+                </div>
+              ))}
+            </div>
+            {pct < 100 && (
+              <div className="flex gap-2 pt-1 flex-wrap">
+                {!profile.firstName && (
+                  <Link href="/candidate/profile"
+                    className="text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5 transition-colors hover:bg-slate-50">
+                    + Контакты
+                  </Link>
+                )}
+                {profile.assessments.length === 0 && (
+                  <Link href="/candidate/assessment"
+                    className="text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg px-3 py-1.5 transition-colors hover:bg-slate-50">
+                    + Пройти оценку
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Assessment status */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Оценка (Assessment)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {["HOGAN", "DISC", "MBTI"].map((type) => {
-                const a = profile.assessments.find((x) => x.type === type);
+          <div className="pc p-6 space-y-4">
+            <p className="text-sm font-semibold text-slate-800">Оценка (Assessment)</p>
+            <div className="space-y-2.5">
+              {[
+                { type: "HOGAN", icon: "🔬", label: "Hogan Assessments" },
+                { type: "DISC",  icon: "🎯", label: "DISC Profile" },
+                { type: "MBTI",  icon: "🧩", label: "MBTI" },
+              ].map(({ type, icon, label }) => {
+                const done = profile.assessments.some((a) => a.type === type);
                 return (
-                  <div key={type} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm">
-                      <span>{type === "HOGAN" ? "🔬" : type === "DISC" ? "🎯" : "🧩"}</span>
-                      <span>{type === "HOGAN" ? "Hogan" : type}</span>
+                  <div key={type} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+                    <div className="flex items-center gap-2.5 text-sm">
+                      <span className="text-base">{icon}</span>
+                      <span className={done ? "text-slate-800 font-medium" : "text-slate-500"}>{label}</span>
                     </div>
-                    {a ? (
-                      <Badge variant="default" className="text-xs">Завершён</Badge>
+                    {done ? (
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-100">
+                        Завершён
+                      </span>
                     ) : (
-                      <Badge variant="secondary" className="text-xs">Не пройден</Badge>
+                      <span className="text-xs text-slate-400 font-medium">Не пройден</span>
                     )}
                   </div>
                 );
               })}
-              <Button variant="outline" size="sm" className="w-full mt-1" asChild>
-                <Link href="/candidate/assessment">
-                  {profile.assessments.length === 0 ? "Запросить оценку" : "Управлять оценками"}
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
+            <Link
+              href="/candidate/assessment"
+              className="flex items-center justify-between w-full text-sm text-slate-600 hover:text-slate-900 font-medium pt-1 transition-colors"
+            >
+              {profile.assessments.length === 0 ? "Запросить тестирование" : "Управлять оценками"}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
 
-        {/* Benchmark */}
+        {/* Salary benchmark */}
         <SalaryBenchmark
           candidateId={profile.id}
           industry={profile.industry}
@@ -268,66 +278,67 @@ export default async function CandidateDashboard() {
         />
 
         {/* Quick actions */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Быстрые действия</CardTitle>
-          </CardHeader>
-          <CardContent className="grid sm:grid-cols-4 gap-2">
+        <div className="pc p-6">
+          <p className="eyebrow mb-4">Быстрые действия</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
-              { href: "/candidate/profile", icon: FileText, label: "Редактировать профиль" },
-              { href: "/candidate/matches", icon: Sparkles, label: "Все мэтчи" },
-              { href: "/candidate/assessment", icon: Star, label: "Оценка" },
-              { href: "/candidate/services", icon: BarChart2, label: "Услуги" },
+              { href: "/candidate/profile",    icon: FileText,  label: "Редактировать профиль" },
+              { href: "/candidate/matches",    icon: Sparkles,  label: "Все мэтчи" },
+              { href: "/candidate/assessment", icon: Star,      label: "Оценка" },
+              { href: "/candidate/services",   icon: BarChart2, label: "Услуги" },
             ].map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}
                 href={href}
-                className="flex items-center justify-between p-2.5 rounded-lg hover:bg-muted transition-colors group"
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-slate-600 font-medium hover:bg-slate-50 hover:text-slate-900 transition-all group"
               >
-                <div className="flex items-center gap-2.5">
-                  <Icon className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm">{label}</span>
-                </div>
-                <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Icon className="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" />
+                <span className="truncate">{label}</span>
               </Link>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Recent matches */}
         {profile.matches.length > 0 && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Последние мэтчи</CardTitle>
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/candidate/matches">Все мэтчи</Link>
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {profile.matches.map((match) => (
-                <div key={match.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                  <div>
-                    <p className="font-medium text-sm">{match.mandate.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {match.mandate.isAnonymous ? "Анонимная компания" : match.mandate.company.companyName}
-                      {" · "}
-                      {MANDATE_TYPE_LABEL[match.mandate.mandateType] ?? match.mandate.mandateType}
+          <div className="pc overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-50">
+              <p className="text-sm font-semibold text-slate-800">Последние мэтчи</p>
+              <Link href="/candidate/matches" className="text-xs text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 transition-colors">
+                Все мэтчи <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {profile.matches.map((m) => (
+                <div key={m.id} className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/60 transition-colors">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-slate-800 truncate">{m.mandate.title}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {m.mandate.isAnonymous ? "Анонимная компания" : m.mandate.company.companyName}
+                      <span className="mx-1.5">·</span>
+                      {MATCH_TYPE_LABEL[m.mandate.mandateType] ?? m.mandate.mandateType}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-muted-foreground">{match.score}%</span>
-                    {match.status === "MUTUAL" ? (
-                      <Badge className="bg-green-600 text-xs">Взаимно</Badge>
-                    ) : match.candidateInterest ? (
-                      <Badge variant="secondary" className="text-xs">Интерес</Badge>
+                  <div className="flex items-center gap-3 ml-4 shrink-0">
+                    <span className="text-sm font-bold text-slate-500 tabular-nums">{m.score}%</span>
+                    {m.status === "MUTUAL" ? (
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-100">
+                        Взаимно
+                      </span>
+                    ) : m.candidateInterest ? (
+                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
+                        Интерес
+                      </span>
                     ) : (
-                      <Badge variant="outline" className="text-xs">Новый</Badge>
+                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
+                        Новый
+                      </span>
                     )}
                   </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </main>
     </div>
