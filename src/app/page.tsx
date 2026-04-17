@@ -2,17 +2,6 @@ import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "UbXec — Анонимный маркетплейс для Executive Search",
-  description:
-    "Найм топ-менеджеров без посредников: C-level кандидаты и компании встречаются анонимно. Контакт раскрывается только при взаимном интересе.",
-  openGraph: {
-    title: "UbXec — Анонимный маркетплейс для Executive Search",
-    description:
-      "Найм топ-менеджеров без посредников. Скрытый профиль до взаимного интереса. Нет холодных звонков. Нет утечек. Прямой контакт.",
-  },
-};
 import {
   UserCircle,
   Sparkles,
@@ -27,7 +16,24 @@ import {
   Building2,
   ChevronRight,
   Lock,
+  Brain,
+  BarChart3,
+  Award,
+  Target,
+  MessageSquare,
+  Briefcase,
 } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "UbXec — Premium AI-powered Executive Search",
+  description:
+    "Премиальная платформа executive search нового поколения. AI-powered мэтчинг, assessment-driven matching, confidential search для топ-менеджеров и компаний.",
+  openGraph: {
+    title: "UbXec — Premium AI-powered Executive Search",
+    description:
+      "Confidential executive search. AI-powered matching. Assessment-driven. Для топ-менеджеров и компаний — без компромиссов по качеству.",
+  },
+};
 
 export default async function Home() {
   const session = await auth();
@@ -45,32 +51,20 @@ export default async function Home() {
       {/* ── NAV ─────────────────────────────────────────────────────────── */}
       <header
         className="sticky top-0 z-50 border-b"
-        style={{
-          background: "hsl(222 47% 7%)",
-          borderColor: "rgba(255,255,255,0.07)",
-        }}
+        style={{ background: "hsl(222 47% 7%)", borderColor: "rgba(255,255,255,0.07)" }}
       >
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <span
             className="text-xl font-bold tracking-tight"
-            style={{
-              fontFamily: "var(--font-playfair), Georgia, serif",
-              color: "hsl(40 33% 96%)",
-            }}
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
           >
             UbXec
           </span>
           <nav className="flex gap-2 items-center">
-            <Link
-              href="/pricing"
-              className="nav-ghost-link px-4 py-2 text-sm rounded-lg transition-colors"
-            >
+            <Link href="/pricing" className="nav-ghost-link px-4 py-2 text-sm rounded-lg transition-colors">
               Тарифы
             </Link>
-            <Link
-              href="/auth/login"
-              className="nav-ghost-link px-4 py-2 text-sm rounded-lg transition-colors"
-            >
+            <Link href="/auth/login" className="nav-ghost-link px-4 py-2 text-sm rounded-lg transition-colors">
               Войти
             </Link>
             <Link
@@ -78,7 +72,7 @@ export default async function Home() {
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-all"
               style={{ background: "hsl(38 52% 48%)", color: "#fff" }}
             >
-              Начать бесплатно
+              Начать
               <ChevronRight size={14} />
             </Link>
           </nav>
@@ -90,18 +84,11 @@ export default async function Home() {
         {/* ── HERO ──────────────────────────────────────────────────────── */}
         <section
           className="relative overflow-hidden hero-grid"
-          style={{
-            background: "hsl(222 47% 7%)",
-            minHeight: "calc(100vh - 64px)",
-            display: "flex",
-            alignItems: "center",
-          }}
+          style={{ background: "hsl(222 47% 7%)", minHeight: "calc(100vh - 64px)", display: "flex", alignItems: "center" }}
         >
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{
-              background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(184,149,90,0.12), transparent)",
-            }}
+            style={{ background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(184,149,90,0.12), transparent)" }}
           />
 
           <div className="relative max-w-6xl mx-auto px-6 py-28 w-full">
@@ -118,7 +105,7 @@ export default async function Home() {
               >
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: "hsl(38 52% 60%)" }} />
                 <span className="text-xs font-medium tracking-widest uppercase" style={{ color: "hsl(38 60% 72%)" }}>
-                  Executive Search Platform
+                  Premium AI-powered Executive Search
                 </span>
               </div>
 
@@ -135,12 +122,9 @@ export default async function Home() {
                   marginBottom: "1.5rem",
                 }}
               >
-                Топ-менеджеры
+                Executive Search
                 <br />
-                находят{" "}
-                <span style={{ color: "hsl(38 52% 55%)", fontStyle: "italic" }}>лучшее</span>
-                <br />
-                молча
+                <span style={{ color: "hsl(38 52% 55%)", fontStyle: "italic" }}>нового поколения</span>
               </h1>
 
               <p
@@ -149,13 +133,13 @@ export default async function Home() {
                   fontSize: "1.125rem",
                   lineHeight: 1.7,
                   color: "rgba(255,255,255,0.5)",
-                  maxWidth: "520px",
+                  maxWidth: "560px",
                   marginBottom: "2.5rem",
                 }}
               >
-                Анонимный маркетплейс для C-level найма в России.
-                Алгоритм подбирает пары по индустрии, роли и компенсации.
-                Данные обеих сторон раскрываются только при взаимном интересе.
+                Премиальная платформа для confidential найма топ-менеджеров.
+                AI-powered мэтчинг с учётом assessment-профиля. Полная конфиденциальность
+                до момента взаимного интереса обеих сторон.
               </p>
 
               <div className="flex flex-wrap gap-3 animate-fade-up-delay-3">
@@ -165,7 +149,7 @@ export default async function Home() {
                   style={{ background: "hsl(40 33% 96%)", color: "hsl(222 47% 8%)" }}
                 >
                   <UserCircle size={16} />
-                  Я ищу позицию
+                  Я топ-менеджер
                   <span className="group-hover:translate-x-0.5 transition-transform inline-block">→</span>
                 </Link>
                 <Link
@@ -178,12 +162,12 @@ export default async function Home() {
                   }}
                 >
                   <Building2 size={16} />
-                  Ищу кандидата
+                  Ищу руководителя
                 </Link>
               </div>
 
               <p className="mt-5 text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
-                Бесплатно для кандидатов · Без публичного резюме · Верификация каждого профиля
+                Бесплатно для кандидатов · Confidential search · Верификация каждого профиля
               </p>
             </div>
           </div>
@@ -205,16 +189,13 @@ export default async function Home() {
           <div className="max-w-6xl mx-auto px-6 py-8">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
               {[
-                { value: "C-level", label: "только топ-роли", icon: <TrendingUp size={16} /> },
-                { value: "100%", label: "анонимность до мэтча", icon: <EyeOff size={16} /> },
-                { value: "0 ₽", label: "для кандидатов", icon: <BadgeCheck size={16} /> },
+                { value: "AI", label: "powered matching", icon: <Brain size={16} /> },
+                { value: "100%", label: "confidential search", icon: <EyeOff size={16} /> },
+                { value: "Assessed", label: "verified candidates", icon: <BadgeCheck size={16} /> },
                 { value: "48ч", label: "до первого мэтча", icon: <Clock size={16} /> },
               ].map(({ value, label, icon }) => (
                 <div key={label}>
-                  <div
-                    className="flex justify-center mb-2"
-                    style={{ color: "rgba(255,255,255,0.2)" }}
-                  >
+                  <div className="flex justify-center mb-2" style={{ color: "rgba(255,255,255,0.2)" }}>
                     {icon}
                   </div>
                   <p
@@ -264,23 +245,23 @@ export default async function Home() {
                 {
                   n: "01",
                   icon: <UserCircle size={28} />,
-                  title: "Создайте анонимный профиль",
-                  body: "Кандидат описывает опыт и достижения без имени. Компания создаёт позицию с требованиями и вилкой компенсации.",
-                  detail: "Профиль проверяет администратор платформы",
+                  title: "Confidential профиль",
+                  body: "Кандидат описывает опыт, достижения и форматы взаимодействия без раскрытия имени. Компания создаёт запрос с требованиями и вилкой компенсации.",
+                  detail: "Каждый профиль верифицируется командой UbXec",
                 },
                 {
                   n: "02",
-                  icon: <Sparkles size={28} />,
-                  title: "Алгоритм подбирает пары",
-                  body: "Система автоматически сопоставляет кандидатов и позиции по индустрии, функциональному фокусу и уровню компенсации.",
+                  icon: <Brain size={28} />,
+                  title: "AI анализирует совместимость",
+                  body: "Алгоритм сопоставляет кандидатов и запросы по опыту, индустрии, компенсации и assessment-профилю. Учитывает формат взаимодействия: найм, ментор, консультант, Advisory Board.",
                   detail: "Обе стороны видят только профессиональные данные",
                 },
                 {
                   n: "03",
                   icon: <Handshake size={28} />,
-                  title: "Взаимный интерес — раскрытие",
-                  body: "Когда обе стороны отметили «Интересует» — контакты открываются и вы выходите на прямой диалог без посредников.",
-                  detail: "Уведомление на email в момент раскрытия",
+                  title: "Взаимный интерес — прямой контакт",
+                  body: "Когда обе стороны отметили интерес — контакты раскрываются. Прямой диалог без посредников и агентских комиссий.",
+                  detail: "Email-уведомление в момент раскрытия",
                 },
               ].map(({ n, icon, title, body, detail }) => (
                 <div key={n} className="group p-10 bg-white transition-all duration-300 hover:bg-stone-50">
@@ -298,22 +279,12 @@ export default async function Home() {
                         fontWeight: 700,
                         color: "hsl(220 13% 91%)",
                         lineHeight: 1,
-                        transition: "color 0.3s",
                       }}
-                      className="group-hover:text-stone-300"
                     >
                       {n}
                     </span>
                   </div>
-                  <h3
-                    style={{
-                      fontSize: "1.0625rem",
-                      fontWeight: 600,
-                      color: "hsl(222 47% 8%)",
-                      marginBottom: "0.75rem",
-                      lineHeight: 1.3,
-                    }}
-                  >
+                  <h3 style={{ fontSize: "1.0625rem", fontWeight: 600, color: "hsl(222 47% 8%)", marginBottom: "0.75rem", lineHeight: 1.3 }}>
                     {title}
                   </h3>
                   <p style={{ fontSize: "0.875rem", color: "hsl(220 9% 46%)", lineHeight: 1.7, marginBottom: "1rem" }}>
@@ -324,6 +295,96 @@ export default async function Home() {
                   </p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── ASSESSMENT SECTION ────────────────────────────────────────── */}
+        <section
+          className="py-28 px-6"
+          style={{ background: "hsl(222 47% 7%)" }}
+        >
+          <div className="max-w-6xl mx-auto">
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                background: "radial-gradient(ellipse 60% 60% at 70% 50%, rgba(184,149,90,0.07), transparent)",
+                inset: 0,
+              }}
+            />
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <div>
+                <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: "hsl(38 60% 62%)" }}>
+                  Assessment-driven
+                </p>
+                <h2
+                  style={{
+                    fontFamily: "var(--font-playfair), Georgia, serif",
+                    fontSize: "clamp(2rem, 4vw, 2.75rem)",
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.02em",
+                    color: "hsl(40 33% 96%)",
+                    marginBottom: "1.5rem",
+                  }}
+                >
+                  Не просто профиль —
+                  <br />
+                  <span style={{ color: "hsl(38 52% 55%)", fontStyle: "italic" }}>оценённый руководитель</span>
+                </h2>
+                <p style={{ fontSize: "0.9375rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8, marginBottom: "2rem" }}>
+                  Каждый кандидат проходит профессиональный assessment. AI генерирует flash-report
+                  с управленческим профилем, сильными сторонами и рисками. Компании видят
+                  не только опыт, но и стиль лидерства.
+                </p>
+                <div className="space-y-3">
+                  {[
+                    { icon: <Brain size={15} />, text: "DISC, MBTI, Hogan — стандарты мировой практики" },
+                    { icon: <Award size={15} />, text: "AI flash-report с интерпретацией для каждого кандидата" },
+                    { icon: <Target size={15} />, text: "Совместимость кандидата и CEO по Hogan-профилю" },
+                    { icon: <BarChart3 size={15} />, text: "Фильтрация по assessment-параметрам и управленческому стилю" },
+                  ].map(({ icon, text }) => (
+                    <div key={text} className="flex items-start gap-3">
+                      <span
+                        className="mt-0.5 shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ background: "rgba(184,149,90,0.15)", color: "hsl(38 60% 62%)" }}
+                      >
+                        {icon}
+                      </span>
+                      <span style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>{text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: "Flash-report", desc: "AI-интерпретация assessment за 24 часа", icon: <Zap size={20} /> },
+                  { label: "Hogan Compatibility", desc: "Анализ совместимости с CEO компании", icon: <Target size={20} /> },
+                  { label: "Management Style", desc: "Стиль лидерства и принятия решений", icon: <Brain size={20} /> },
+                  { label: "Deep-dive Session", desc: "Разбор результатов с ассессором", icon: <MessageSquare size={20} /> },
+                ].map(({ label, desc, icon }) => (
+                  <div
+                    key={label}
+                    className="rounded-xl p-5"
+                    style={{
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    <div
+                      className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"
+                      style={{ background: "rgba(184,149,90,0.12)", color: "hsl(38 60% 62%)" }}
+                    >
+                      {icon}
+                    </div>
+                    <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "hsl(40 33% 92%)", marginBottom: "0.375rem" }}>
+                      {label}
+                    </p>
+                    <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.35)", lineHeight: 1.5 }}>{desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -345,16 +406,14 @@ export default async function Home() {
                   color: "hsl(222 47% 8%)",
                 }}
               >
-                Создан для тех, кто ценит конфиденциальность
+                Создан для лидеров,
+                <br />ценящих конфиденциальность
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Candidates */}
-              <div
-                className="relative overflow-hidden rounded-2xl p-10"
-                style={{ background: "hsl(222 47% 7%)" }}
-              >
+              <div className="relative overflow-hidden rounded-2xl p-10" style={{ background: "hsl(222 47% 7%)" }}>
                 <div
                   className="absolute top-0 right-0 w-48 h-48 pointer-events-none"
                   style={{ background: "radial-gradient(circle, rgba(184,149,90,0.15), transparent 70%)" }}
@@ -364,7 +423,7 @@ export default async function Home() {
                   style={{ background: "rgba(184,149,90,0.12)", color: "hsl(38 60% 62%)" }}
                 >
                   <UserCircle size={13} />
-                  Для кандидатов
+                  Для топ-менеджеров
                 </div>
                 <h3
                   style={{
@@ -372,20 +431,24 @@ export default async function Home() {
                     fontSize: "1.75rem",
                     fontWeight: 700,
                     color: "hsl(40 33% 96%)",
-                    marginBottom: "1.5rem",
+                    marginBottom: "0.75rem",
                     lineHeight: 1.2,
                   }}
                 >
                   CEO, CFO, CTO, COO
                   <br />и другие C-level роли
                 </h3>
+                <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.35)", marginBottom: "1.5rem" }}>
+                  Найм в штат · Ментор · Консультант · Advisory Board
+                </p>
                 <ul className="space-y-3 mb-8">
                   {[
                     { icon: <Lock size={13} />, text: "Поиск без риска для текущей позиции" },
-                    { icon: <Sparkles size={13} />, text: "Только релевантные предложения" },
+                    { icon: <Brain size={13} />, text: "Бесплатный assessment и AI flash-report" },
                     { icon: <ShieldCheck size={13} />, text: "Вы контролируете раскрытие данных" },
-                    { icon: <BadgeCheck size={13} />, text: "Верификация открывает лучшие позиции" },
-                    { icon: <TrendingUp size={13} />, text: "Бесплатно навсегда" },
+                    { icon: <Sparkles size={13} />, text: "Только релевантные предложения" },
+                    { icon: <Briefcase size={13} />, text: "Несколько форматов: штат, ментор, advisory" },
+                    { icon: <BadgeCheck size={13} />, text: "Бесплатно для кандидатов навсегда" },
                   ].map(({ icon, text }) => (
                     <li key={text} className="flex gap-3 items-start">
                       <span
@@ -394,9 +457,7 @@ export default async function Home() {
                       >
                         {icon}
                       </span>
-                      <span style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>
-                        {text}
-                      </span>
+                      <span style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{text}</span>
                     </li>
                   ))}
                 </ul>
@@ -405,7 +466,7 @@ export default async function Home() {
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all hover:gap-3"
                   style={{ background: "hsl(38 52% 48%)", color: "#fff" }}
                 >
-                  Создать профиль →
+                  Создать confidential профиль →
                 </Link>
               </div>
 
@@ -419,7 +480,7 @@ export default async function Home() {
                   style={{ background: "hsl(220 14% 94%)", color: "hsl(38 52% 42%)" }}
                 >
                   <Building2 size={13} />
-                  Для компаний
+                  Для компаний и фондов
                 </div>
                 <h3
                   style={{
@@ -427,21 +488,24 @@ export default async function Home() {
                     fontSize: "1.75rem",
                     fontWeight: 700,
                     color: "hsl(222 47% 8%)",
-                    marginBottom: "1.5rem",
+                    marginBottom: "0.75rem",
                     lineHeight: 1.2,
                   }}
                 >
                   Корпорации,
                   <br />PE-фонды, стартапы
                 </h3>
+                <p style={{ fontSize: "0.8125rem", color: "hsl(220 9% 60%)", marginBottom: "1.5rem" }}>
+                  Найм в штат · Ментор для CEO · Консультант · Advisory Board
+                </p>
                 <ul className="space-y-3 mb-8">
                   {[
-                    { icon: <Building2 size={13} />, text: "Поиск для портфельных компаний" },
-                    { icon: <EyeOff size={13} />, text: "Анонимные позиции — не раскрывайте детали раньше времени" },
-                    { icon: <ShieldCheck size={13} />, text: "Верифицированные кандидаты C-level" },
-                    { icon: <Users size={13} />, text: "Доступ к пассивным кандидатам с рынка" },
-                    { icon: <Zap size={13} />, text: "Мэтчинг без участия рекрутера" },
-                    { icon: <TrendingUp size={13} />, text: "Фиксированный абонемент без % от зарплаты" },
+                    { icon: <Building2 size={13} />, text: "Поиск для портфельных и дочерних компаний" },
+                    { icon: <EyeOff size={13} />, text: "Скрытый поиск — не раскрывайте позицию публично" },
+                    { icon: <Brain size={13} />, text: "Assessment-driven — оценённые кандидаты с профилем" },
+                    { icon: <Target size={13} />, text: "Hogan compatibility с профилем CEO" },
+                    { icon: <Users size={13} />, text: "Доступ к пассивным C-level кандидатам" },
+                    { icon: <Zap size={13} />, text: "Фиксированный абонемент без % от зарплаты" },
                   ].map(({ icon, text }) => (
                     <li key={text} className="flex gap-3 items-start">
                       <span
@@ -450,9 +514,7 @@ export default async function Home() {
                       >
                         {icon}
                       </span>
-                      <span style={{ fontSize: "0.875rem", color: "hsl(220 9% 46%)", lineHeight: 1.6 }}>
-                        {text}
-                      </span>
+                      <span style={{ fontSize: "0.875rem", color: "hsl(220 9% 46%)", lineHeight: 1.6 }}>{text}</span>
                     </li>
                   ))}
                 </ul>
@@ -461,7 +523,7 @@ export default async function Home() {
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all border hover:bg-stone-50"
                   style={{ borderColor: "hsl(222 47% 8%)", color: "hsl(222 47% 8%)" }}
                 >
-                  Разместить позицию →
+                  Разместить запрос →
                 </Link>
               </div>
             </div>
@@ -481,8 +543,8 @@ export default async function Home() {
                 letterSpacing: "-0.01em",
               }}
             >
-              «Лучшие переходы в карьере происходят
-              <br className="hidden sm:block" /> тихо и по взаимному выбору»
+              «Лучшие назначения происходят конфиденциально,
+              <br className="hidden sm:block" /> по взаимному выбору и на основе реальной оценки»
             </p>
             <div className="w-12 h-px mx-auto mt-8" style={{ background: "hsl(38 52% 48%)" }} />
           </div>
@@ -505,7 +567,7 @@ export default async function Home() {
                   color: "hsl(222 47% 8%)",
                 }}
               >
-                Не hh.ru и не агентство
+                Почему UbXec — другой уровень
               </h2>
             </div>
 
@@ -513,18 +575,18 @@ export default async function Home() {
               {[
                 {
                   icon: <EyeOff size={22} />,
-                  title: "Анонимность",
-                  body: "Ни компания, ни кандидат не знают друг о друге до взаимного интереса. Это принципиально отличает нас от hh.ru и LinkedIn.",
+                  title: "Confidential Search",
+                  body: "Двусторонняя конфиденциальность. Кандидат не раскрывает себя публично. Компания ведёт скрытый поиск. Контакты открываются только при взаимном интересе.",
                 },
                 {
-                  icon: <Sparkles size={22} />,
-                  title: "Умный мэтчинг",
-                  body: "Алгоритм сопоставляет по десяткам параметров. Вы получаете только те предложения, которые реально соответствуют вашему уровню.",
+                  icon: <Brain size={22} />,
+                  title: "AI-powered & Assessment",
+                  body: "Мэтчинг учитывает не только опыт и компенсацию, но и assessment-профиль кандидата: управленческий стиль, DISC, Hogan. Точнее любого ручного подбора.",
                 },
                 {
-                  icon: <Users size={22} />,
-                  title: "Без посредников",
-                  body: "Никаких консультантов и их комиссий. После раскрытия контактов вы общаетесь напрямую. Платформа берёт только абонемент.",
+                  icon: <Award size={22} />,
+                  title: "Premium Community",
+                  body: "Только верифицированные C-level специалисты. Ручная проверка каждого профиля командой UbXec. Никаких случайных кандидатов — только реальный топ-уровень.",
                 },
               ].map(({ icon, title, body }) => (
                 <div
@@ -533,7 +595,7 @@ export default async function Home() {
                   style={{ borderColor: "hsl(220 13% 91%)" }}
                 >
                   <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center mb-5 transition-colors"
+                    className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
                     style={{ background: "hsl(220 14% 95%)", color: "hsl(38 52% 48%)" }}
                   >
                     {icon}
@@ -551,10 +613,7 @@ export default async function Home() {
         </section>
 
         {/* ── CTA ───────────────────────────────────────────────────────── */}
-        <section
-          className="relative overflow-hidden py-28 px-6"
-          style={{ background: "hsl(222 47% 7%)" }}
-        >
+        <section className="relative overflow-hidden py-28 px-6" style={{ background: "hsl(222 47% 7%)" }}>
           <div
             className="absolute inset-0 pointer-events-none"
             style={{ background: "radial-gradient(ellipse 60% 80% at 50% 120%, rgba(184,149,90,0.1), transparent)" }}
@@ -577,18 +636,12 @@ export default async function Home() {
                 marginBottom: "1.25rem",
               }}
             >
-              Готовы к следующему шагу?
+              Готовы к следующему
+              <br />карьерному шагу?
             </h2>
-            <p
-              style={{
-                fontSize: "1.0625rem",
-                color: "rgba(255,255,255,0.45)",
-                marginBottom: "2.5rem",
-                lineHeight: 1.7,
-              }}
-            >
-              Регистрация занимает две минуты. Мы верифицируем
-              <br className="hidden sm:block" /> ваш профиль в течение 24 часов.
+            <p style={{ fontSize: "1.0625rem", color: "rgba(255,255,255,0.45)", marginBottom: "2.5rem", lineHeight: 1.7 }}>
+              Регистрация занимает две минуты.
+              <br className="hidden sm:block" /> Верификация и assessment — в течение 24 часов.
             </p>
             <div className="flex gap-3 justify-center flex-wrap">
               <Link
@@ -597,7 +650,7 @@ export default async function Home() {
                 style={{ background: "hsl(38 52% 48%)", color: "#fff" }}
               >
                 <UserCircle size={16} />
-                Я кандидат
+                Я топ-менеджер
                 <span className="group-hover:translate-x-0.5 transition-transform inline-block">→</span>
               </Link>
               <Link
@@ -618,32 +671,18 @@ export default async function Home() {
       </main>
 
       {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-      <footer
-        style={{
-          background: "hsl(222 47% 5%)",
-          borderTop: "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
+      <footer style={{ background: "hsl(222 47% 5%)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span
-            style={{
-              fontFamily: "var(--font-playfair), Georgia, serif",
-              color: "rgba(255,255,255,0.35)",
-              fontSize: "0.875rem",
-            }}
-          >
+          <span style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "rgba(255,255,255,0.35)", fontSize: "0.875rem" }}>
             UbXec
           </span>
           <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.2)" }}>
-            © 2025 · Executive Search Platform · Москва
+            © 2026 · Premium Executive Search Platform · Москва
           </p>
           <div className="flex gap-5">
-            <Link href="/auth/login" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>
-              Войти
-            </Link>
-            <Link href="/auth/register" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>
-              Регистрация
-            </Link>
+            <Link href="/pricing" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Тарифы</Link>
+            <Link href="/auth/login" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Войти</Link>
+            <Link href="/auth/register" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Регистрация</Link>
           </div>
         </div>
       </footer>

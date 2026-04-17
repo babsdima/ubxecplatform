@@ -41,6 +41,8 @@ model CandidateProfile {
   phone          String?
   linkedinUrl    String?
 
+  engagementFormats String @default("full-time")
+
   status    String  @default("PENDING")
   adminNote String?
 
@@ -84,6 +86,7 @@ model Mandate {
   description  String
   requirements String
   isAnonymous  Boolean @default(false)
+  mandateType  String  @default("full-time")
   status       String  @default("DRAFT")
 
   createdAt DateTime @default(now())

@@ -87,15 +87,24 @@ export default async function NewMandatePage() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="mandateType">Тип взаимодействия *</Label>
+                <select
+                  id="mandateType"
+                  name="mandateType"
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                >
+                  <option value="full-time">Найм в штат (full-time)</option>
+                  <option value="mentor">Ментор для команды / CEO</option>
+                  <option value="consultant">Консультант / Part-time advisor</option>
+                  <option value="board">Advisory Board</option>
+                </select>
+              </div>
+
               <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="isAnonymous"
-                  name="isAnonymous"
-                  className="h-4 w-4"
-                />
+                <input type="checkbox" id="isAnonymous" name="isAnonymous" className="h-4 w-4" />
                 <Label htmlFor="isAnonymous" className="cursor-pointer">
-                  Анонимная позиция (компания скрыта до взаимного интереса)
+                  Конфиденциальный поиск (компания скрыта до взаимного интереса)
                 </Label>
               </div>
 

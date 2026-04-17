@@ -95,6 +95,30 @@ export default async function CandidateOnboarding() {
                 <Input id="locationPref" name="locationPref" placeholder="Москва, Удалённо..." required />
               </div>
 
+              <div className="space-y-3">
+                <Label>Форматы взаимодействия *</Label>
+                <p className="text-xs text-muted-foreground">Выберите один или несколько форматов, в которых вы готовы работать</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: "full-time", label: "Найм в штат (full-time)" },
+                    { value: "mentor", label: "Ментор" },
+                    { value: "consultant", label: "Консультант / Advisor" },
+                    { value: "board", label: "Advisory Board" },
+                  ].map(({ value, label }) => (
+                    <label key={value} className="flex items-center gap-2 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors">
+                      <input
+                        type="checkbox"
+                        name="engagementFormats"
+                        value={value}
+                        defaultChecked={value === "full-time"}
+                        className="h-4 w-4"
+                      />
+                      <span className="text-sm">{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <Button type="submit" className="w-full" size="lg">
                 Создать профиль и перейти к мэтчам
               </Button>

@@ -150,6 +150,141 @@ async function main() {
     },
   });
 
+  // Кандидат 6 — CEO (Технологии, ментор + full-time)
+  const cand6User = await prisma.user.upsert({
+    where: { email: "ceo@example.ru" },
+    update: {},
+    create: { email: "ceo@example.ru", password, role: "CANDIDATE" },
+  });
+  await prisma.candidateProfile.upsert({
+    where: { userId: cand6User.id },
+    update: {},
+    create: {
+      userId: cand6User.id,
+      currentTitle: "CEO",
+      industry: "Технологии",
+      yearsExperience: 18,
+      achievements: "Вывел SaaS-компанию с $2M до $40M ARR, провёл Series C на $60M, построил команду 300+ человек в 5 странах.",
+      salaryMin: 20000000,
+      salaryMax: 40000000,
+      locationPref: "Москва / Удалённо",
+      functionalFocus: "Стратегия",
+      firstName: "Андрей",
+      lastName: "Соколов",
+      currentCompany: "SaaSGrowth",
+      status: "VERIFIED",
+      engagementFormats: "full-time,mentor,board",
+    },
+  });
+
+  // Кандидат 7 — CHRO/HRD (открыт к ментору и консультанту)
+  const cand7User = await prisma.user.upsert({
+    where: { email: "hrd@example.ru" },
+    update: {},
+    create: { email: "hrd@example.ru", password, role: "CANDIDATE" },
+  });
+  await prisma.candidateProfile.upsert({
+    where: { userId: cand7User.id },
+    update: {},
+    create: {
+      userId: cand7User.id,
+      currentTitle: "CHRO",
+      industry: "Технологии",
+      yearsExperience: 13,
+      achievements: "Трансформировал HR-функцию в компании 2000 чел., снизил текучесть топ-менеджмента до 8%, построил систему succession planning.",
+      salaryMin: 8000000,
+      salaryMax: 15000000,
+      locationPref: "Москва",
+      functionalFocus: "HR / People",
+      firstName: "Наталья",
+      lastName: "Орлова",
+      currentCompany: "TechHolding",
+      status: "VERIFIED",
+      engagementFormats: "full-time,consultant",
+    },
+  });
+
+  // Кандидат 8 — CPO (Технологии)
+  const cand8User = await prisma.user.upsert({
+    where: { email: "cpo@example.ru" },
+    update: {},
+    create: { email: "cpo@example.ru", password, role: "CANDIDATE" },
+  });
+  await prisma.candidateProfile.upsert({
+    where: { userId: cand8User.id },
+    update: {},
+    create: {
+      userId: cand8User.id,
+      currentTitle: "CPO",
+      industry: "Технологии",
+      yearsExperience: 11,
+      achievements: "Запустил 4 B2C продукта с DAU 1M+, внедрил product-led growth стратегию, рост retention с 30% до 68% за 2 года.",
+      salaryMin: 13000000,
+      salaryMax: 22000000,
+      locationPref: "Москва / Удалённо",
+      functionalFocus: "Продукт",
+      firstName: "Максим",
+      lastName: "Белов",
+      currentCompany: "ProductLab",
+      status: "VERIFIED",
+      engagementFormats: "full-time,consultant",
+    },
+  });
+
+  // Кандидат 9 — Commercial Director (FMCG)
+  const cand9User = await prisma.user.upsert({
+    where: { email: "crd@example.ru" },
+    update: {},
+    create: { email: "crd@example.ru", password, role: "CANDIDATE" },
+  });
+  await prisma.candidateProfile.upsert({
+    where: { userId: cand9User.id },
+    update: {},
+    create: {
+      userId: cand9User.id,
+      currentTitle: "Commercial Director",
+      industry: "FMCG",
+      yearsExperience: 16,
+      achievements: "Управлял продажами P&L 25 млрд руб., открыл 3 новых региональных рынка, вырастил дистрибуторскую сеть с 80 до 250 партнёров.",
+      salaryMin: 12000000,
+      salaryMax: 20000000,
+      locationPref: "Москва",
+      functionalFocus: "Продажи / Коммерция",
+      firstName: "Сергей",
+      lastName: "Козлов",
+      currentCompany: "FMCGLeader",
+      status: "VERIFIED",
+      engagementFormats: "full-time",
+    },
+  });
+
+  // Кандидат 10 — GM / Country Manager (Ритейл, Advisory Board)
+  const cand10User = await prisma.user.upsert({
+    where: { email: "gm@example.ru" },
+    update: {},
+    create: { email: "gm@example.ru", password, role: "CANDIDATE" },
+  });
+  await prisma.candidateProfile.upsert({
+    where: { userId: cand10User.id },
+    update: {},
+    create: {
+      userId: cand10User.id,
+      currentTitle: "General Manager",
+      industry: "Ритейл",
+      yearsExperience: 20,
+      achievements: "Руководил 5 розничными сетями суммарно 1200 магазинов, P&L $800M, запустил омниканальную трансформацию.",
+      salaryMin: 18000000,
+      salaryMax: 30000000,
+      locationPref: "Москва",
+      functionalFocus: "Операции / P&L",
+      firstName: "Виктор",
+      lastName: "Морозов",
+      currentCompany: "RetailHolding",
+      status: "VERIFIED",
+      engagementFormats: "full-time,board,mentor",
+    },
+  });
+
   // Компания 1 — PE фонд
   const comp1User = await prisma.user.upsert({
     where: { email: "hr@pegroup.ru" },
@@ -190,6 +325,63 @@ async function main() {
     },
   });
 
+  // Компания 3 — Крупный ритейл
+  const comp3User = await prisma.user.upsert({
+    where: { email: "hr@retailcorp.ru" },
+    update: {},
+    create: { email: "hr@retailcorp.ru", password, role: "COMPANY" },
+  });
+  const comp3 = await prisma.companyProfile.upsert({
+    where: { userId: comp3User.id },
+    update: {},
+    create: {
+      userId: comp3User.id,
+      companyName: "RetailCorp",
+      industry: "Ритейл",
+      size: "LARGE",
+      description: "Федеральная розничная сеть 800+ магазинов, выручка 120 млрд руб/год. Активная цифровая трансформация.",
+      isVerified: true,
+    },
+  });
+
+  // Компания 4 — FinTech стартап
+  const comp4User = await prisma.user.upsert({
+    where: { email: "hr@fintechup.ru" },
+    update: {},
+    create: { email: "hr@fintechup.ru", password, role: "COMPANY" },
+  });
+  const comp4 = await prisma.companyProfile.upsert({
+    where: { userId: comp4User.id },
+    update: {},
+    create: {
+      userId: comp4User.id,
+      companyName: "FinTechUp",
+      industry: "Финансы",
+      size: "SMALL",
+      description: "Финтех-стартап в сфере embedded finance, Series A $15M. Команда 60 человек, планируем рост до 150.",
+      isVerified: true,
+    },
+  });
+
+  // Компания 5 — Industrial холдинг
+  const comp5User = await prisma.user.upsert({
+    where: { email: "hr@indholding.ru" },
+    update: {},
+    create: { email: "hr@indholding.ru", password, role: "COMPANY" },
+  });
+  const comp5 = await prisma.companyProfile.upsert({
+    where: { userId: comp5User.id },
+    update: {},
+    create: {
+      userId: comp5User.id,
+      companyName: "Industrial Holdings",
+      industry: "Промышленность",
+      size: "LARGE",
+      description: "Промышленный холдинг: 3 завода, 4000 сотрудников, выручка 18 млрд руб. Ищем ментора для CEO по теме digital transformation.",
+      isVerified: true,
+    },
+  });
+
   // Мандаты
   const mandate1 = await prisma.mandate.create({
     data: {
@@ -217,6 +409,64 @@ async function main() {
         "Ищем технического директора для масштабирования продукта. Команда 25 инженеров, планируем рост до 60.",
       requirements:
         "8+ лет в разработке, опыт масштабирования команд, знание cloud-архитектур, опыт в B2B SaaS.",
+      status: "ACTIVE",
+    },
+  });
+
+  // Дополнительные мандаты
+  const mandate3 = await prisma.mandate.create({
+    data: {
+      companyId: comp3.id,
+      title: "COO",
+      industry: "Ритейл",
+      salaryMin: 16000000,
+      salaryMax: 28000000,
+      description: "Ищем операционного директора для управления сетью 800+ магазинов в период цифровой трансформации. Приоритет — построение омниканала и оптимизация supply chain.",
+      requirements: "15+ лет в ритейле, опыт управления крупной розничной сетью, P&L от $200M, опыт трансформационных проектов.",
+      mandateType: "full-time",
+      status: "ACTIVE",
+    },
+  });
+
+  const mandate4 = await prisma.mandate.create({
+    data: {
+      companyId: comp4.id,
+      title: "CFO",
+      industry: "Финансы",
+      salaryMin: 8000000,
+      salaryMax: 14000000,
+      description: "Финтех-стартап ищет финансового директора для подготовки к Series B. Задачи: financial modeling, investor relations, построение FP&A функции.",
+      requirements: "Опыт в финтех или стартапах, знание МСФО, опыт с инвесторами, стартап-менталитет.",
+      mandateType: "full-time",
+      status: "ACTIVE",
+      isAnonymous: true,
+    },
+  });
+
+  const mandate5 = await prisma.mandate.create({
+    data: {
+      companyId: comp5.id,
+      title: "Ментор для CEO по digital transformation",
+      industry: "Промышленность",
+      salaryMin: 3000000,
+      salaryMax: 6000000,
+      description: "Промышленный холдинг ищет ментора для CEO по теме цифровой трансформации. Формат: 2–4 сессии в месяц, горизонт 12 месяцев. CEO — сильный операционист без digital-бэкграунда.",
+      requirements: "Опыт успешной digital transformation в крупной компании, умение работать с собственниками, знание промышленного сектора будет плюсом.",
+      mandateType: "mentor",
+      status: "ACTIVE",
+    },
+  });
+
+  const mandate6 = await prisma.mandate.create({
+    data: {
+      companyId: comp1.id,
+      title: "Advisory Board — эксперт по ритейлу",
+      industry: "Ритейл",
+      salaryMin: 2000000,
+      salaryMax: 4000000,
+      description: "PE-фонд формирует Advisory Board для портфельной компании в ритейле. Ищем независимого директора с опытом в федеральной рознице.",
+      requirements: "10+ лет в ритейле на уровне C-suite, опыт работы в Advisory Board или Board of Directors, независимость суждений.",
+      mandateType: "board",
       status: "ACTIVE",
     },
   });
@@ -250,6 +500,50 @@ async function main() {
     });
   }
 
+  // Дополнительные мэтчи
+  const cand6Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand6User.id } });
+  const cand9Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand9User.id } });
+  const cand10Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand10User.id } });
+
+  // COO на позицию COO в RetailCorp — отличный мэтч
+  if (cand3Profile) {
+    await prisma.match.create({
+      data: { mandateId: mandate3.id, candidateProfileId: cand3Profile.id, score: 89, status: "PENDING" },
+    });
+  }
+  // GM на позицию COO в RetailCorp — хороший мэтч
+  if (cand10Profile) {
+    await prisma.match.create({
+      data: { mandateId: mandate3.id, candidateProfileId: cand10Profile.id, score: 84, status: "PENDING", candidateInterest: true },
+    });
+  }
+  // CFO на позицию CFO в FinTechUp
+  if (cand1Profile) {
+    await prisma.match.create({
+      data: { mandateId: mandate4.id, candidateProfileId: cand1Profile.id, score: 78, status: "PENDING" },
+    });
+  }
+  // CEO (Соколов) — ментор для промышленного CEO — взаимный интерес
+  if (cand6Profile) {
+    await prisma.match.create({
+      data: {
+        mandateId: mandate5.id,
+        candidateProfileId: cand6Profile.id,
+        score: 81,
+        status: "MUTUAL",
+        candidateInterest: true,
+        companyInterest: true,
+        revealedAt: new Date(),
+      },
+    });
+  }
+  // GM Морозов на Advisory Board в PE фонде
+  if (cand10Profile) {
+    await prisma.match.create({
+      data: { mandateId: mandate6.id, candidateProfileId: cand10Profile.id, score: 91, status: "PENDING", candidateInterest: true },
+    });
+  }
+
   console.log("✅ Готово! Аккаунты (пароль: password123):");
   console.log("  admin@ubxec.ru      — администратор");
   console.log("  cfo@example.ru      — кандидат CFO (верифицирован, Финансы)");
@@ -257,8 +551,16 @@ async function main() {
   console.log("  coo@example.ru      — кандидат COO (верифицирован, Ритейл)");
   console.log("  cfo2@example.ru     — кандидат CFO #2 (верифицирован, Финансы)");
   console.log("  vpf@example.ru      — кандидат VP Finance (верифицирован, Финансы)");
+  console.log("  ceo@example.ru      — кандидат CEO (верифицирован, Технологии, ментор+board)");
+  console.log("  hrd@example.ru      — кандидат CHRO (верифицирован, Технологии)");
+  console.log("  cpo@example.ru      — кандидат CPO (верифицирован, Технологии)");
+  console.log("  crd@example.ru      — кандидат Commercial Director (верифицирован, FMCG)");
+  console.log("  gm@example.ru       — кандидат GM (верифицирован, Ритейл, ментор+board)");
   console.log("  hr@pegroup.ru       — компания PE Capital Group");
   console.log("  hr@techscale.ru     — компания TechScale Ventures");
+  console.log("  hr@retailcorp.ru    — компания RetailCorp");
+  console.log("  hr@fintechup.ru     — компания FinTechUp");
+  console.log("  hr@indholding.ru    — компания Industrial Holdings");
 }
 
 main()
