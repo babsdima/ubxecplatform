@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VerifyButtons } from "@/components/verify-buttons";
 import { AdminNav } from "@/components/layout/admin-nav";
 import { AdminFilters } from "@/components/admin-filters";
+import { AssessmentAdmin } from "@/components/assessment-admin";
 import { Suspense } from "react";
 
 const statusLabel: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -44,7 +45,7 @@ export default async function AdminCandidates({
           }
         : {}),
     },
-    include: { user: true },
+    include: { user: true, assessments: true },
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
   });
 
@@ -108,6 +109,8 @@ export default async function AdminCandidates({
                     {c.adminNote && (
                       <p className="text-xs text-muted-foreground italic">Заметка: {c.adminNote}</p>
                     )}
+
+                    <AssessmentAdmin profileId={c.id} assessments={c.assessments} />
                   </CardContent>
                 </Card>
               );

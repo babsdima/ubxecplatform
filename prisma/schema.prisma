@@ -49,9 +49,33 @@ model CandidateProfile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  matches Match[]
+  matches     Match[]
+  assessments Assessment[]
 
   @@map("candidate_profiles")
+}
+
+model Assessment {
+  id                 String           @id @default(cuid())
+  candidateProfileId String
+  candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+
+  type   String // HOGAN | DISC | MBTI
+  status String @default("NOT_TAKEN") // NOT_TAKEN | PENDING | COMPLETED
+
+  // Результаты (заполняет администратор или импортируется)
+  summary        String?
+  strengths      String?
+  risks          String?
+  leadershipStyle String?
+  rawResults     String? // JSON-строка с детальными результатами
+
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([candidateProfileId, type])
+  @@map("assessments")
 }
 
 model CompanyProfile {

@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { logoutAction } from "@/lib/actions";
 
-export async function CandidateNav({ active }: { active: "dashboard" | "matches" | "profile" | "services" }) {
+export async function CandidateNav({ active }: { active: "dashboard" | "matches" | "profile" | "services" | "assessment" }) {
   const session = await auth();
   if (!session) return null;
 
@@ -53,6 +53,9 @@ export async function CandidateNav({ active }: { active: "dashboard" | "matches"
           </NavLink>
           <NavLink href="/candidate/profile" active={active === "profile"}>
             Профиль
+          </NavLink>
+          <NavLink href="/candidate/assessment" active={active === "assessment"}>
+            Оценка
           </NavLink>
           <NavLink href="/candidate/services" active={active === "services"}>
             Услуги

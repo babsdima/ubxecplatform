@@ -199,6 +199,36 @@ export async function expressInterest(matchId: string, role: "candidate" | "comp
   return { success: "Интерес отмечен" };
 }
 
+export async function requestAssessment(candidateId: string, type: string) {
+  await prisma.assessment.upsert({
+    where: { candidateProfileId_type: { candidateProfileId: candidateId, type } },
+    update: { status: "PENDING" },
+    create: { candidateProfileId: candidateId, type, status: "PENDING" },
+  });
+  revalidatePath("/candidate/assessment");
+  return { success: "Запрос отправлен" };
+}
+
+export async function saveAssessmentResults(
+  profileId: string,
+  type: string,
+  data: { summary: string; strengths: string; risks: string; leadershipStyle: string }
+) {
+  await prisma.assessment.upsert({
+    where: { candidateProfileId_type: { candidateProfileId: profileId, type } },
+    update: { ...data, status: "COMPLETED", completedAt: new Date() },
+    create: {
+      candidateProfileId: profileId,
+      type,
+      status: "COMPLETED",
+      completedAt: new Date(),
+      ...data,
+    },
+  });
+  revalidatePath("/admin/candidates");
+  return { success: "Результаты сохранены" };
+}
+
 export async function verifyCandidate(profileId: string, status: "VERIFIED" | "REJECTED", note?: string) {
   await prisma.candidateProfile.update({
     where: { id: profileId },

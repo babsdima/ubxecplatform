@@ -23,7 +23,15 @@ export default async function MandatePage({ params }: { params: Promise<{ id: st
     where: { id, companyId: company.id },
     include: {
       matches: {
-        include: { candidate: true },
+        include: {
+          candidate: {
+            include: {
+              assessments: {
+                where: { status: "COMPLETED" },
+              },
+            },
+          },
+        },
         orderBy: { score: "desc" },
       },
     },
@@ -98,6 +106,12 @@ export default async function MandatePage({ params }: { params: Promise<{ id: st
   );
 }
 
+const ASSESSMENT_META: Record<string, { label: string; icon: string }> = {
+  HOGAN: { label: "Hogan", icon: "🔬" },
+  DISC: { label: "DISC", icon: "🎯" },
+  MBTI: { label: "MBTI", icon: "🧩" },
+};
+
 function CandidateMatchCard({
   match,
 }: {
@@ -119,11 +133,20 @@ function CandidateMatchCard({
       functionalFocus: string;
       firstName: string | null;
       lastName: string | null;
+      assessments: {
+        type: string;
+        status: string;
+        summary: string | null;
+        strengths: string | null;
+        risks: string | null;
+        leadershipStyle: string | null;
+      }[];
     };
   };
 }) {
   const isMutual = match.status === "MUTUAL";
   const c = match.candidate;
+  const completedAssessments = c.assessments.filter((a) => a.status === "COMPLETED");
 
   return (
     <Card className={isMutual ? "border-green-500" : ""}>
@@ -139,6 +162,22 @@ function CandidateMatchCard({
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {completedAssessments.length > 0 && (
+            <div className="flex gap-1">
+              {completedAssessments.map((a) => {
+                const meta = ASSESSMENT_META[a.type];
+                return meta ? (
+                  <span
+                    key={a.type}
+                    className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium"
+                    title={`${meta.label} assessment пройден`}
+                  >
+                    {meta.icon} {meta.label}
+                  </span>
+                ) : null;
+              })}
+            </div>
+          )}
           <span className="text-2xl font-bold text-primary">{match.score}%</span>
           {isMutual && <Badge className="bg-green-600">Взаимный</Badge>}
           {match.candidateInterest && !isMutual && (
@@ -148,6 +187,44 @@ function CandidateMatchCard({
       </CardHeader>
       <CardContent className="space-y-3">
         <p className="text-sm">{c.achievements}</p>
+
+        {completedAssessments.length > 0 && (
+          <div className="space-y-3 border-t pt-3">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Результаты оценки</p>
+            {completedAssessments.map((a) => {
+              const meta = ASSESSMENT_META[a.type];
+              if (!meta) return null;
+              return (
+                <div key={a.type} className="rounded-lg border bg-muted/30 p-3 space-y-2">
+                  <p className="text-sm font-semibold">
+                    {meta.icon} {meta.label}
+                  </p>
+                  {a.summary && <p className="text-sm text-muted-foreground">{a.summary}</p>}
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                    {a.strengths && (
+                      <div className="bg-green-50 border border-green-200 rounded p-2">
+                        <p className="text-[11px] font-semibold text-green-700 mb-0.5">Сильные стороны</p>
+                        <p className="text-xs text-green-800">{a.strengths}</p>
+                      </div>
+                    )}
+                    {a.risks && (
+                      <div className="bg-amber-50 border border-amber-200 rounded p-2">
+                        <p className="text-[11px] font-semibold text-amber-700 mb-0.5">Зоны развития</p>
+                        <p className="text-xs text-amber-800">{a.risks}</p>
+                      </div>
+                    )}
+                    {a.leadershipStyle && (
+                      <div className="bg-blue-50 border border-blue-200 rounded p-2">
+                        <p className="text-[11px] font-semibold text-blue-700 mb-0.5">Стиль лидерства</p>
+                        <p className="text-xs text-blue-800">{a.leadershipStyle}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {isMutual && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">

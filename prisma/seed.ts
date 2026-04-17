@@ -544,6 +544,58 @@ async function main() {
     });
   }
 
+  // Assessments для демо-кандидатов
+  const cfo1Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand1User.id } });
+  const cto1Profile = await prisma.candidateProfile.findUnique({ where: { userId: cand2User.id } });
+
+  if (cfo1Profile) {
+    await prisma.assessment.upsert({
+      where: { candidateProfileId_type: { candidateProfileId: cfo1Profile.id, type: "HOGAN" } },
+      update: {},
+      create: {
+        candidateProfileId: cfo1Profile.id,
+        type: "HOGAN",
+        status: "COMPLETED",
+        completedAt: new Date("2025-11-15"),
+        summary: "Высокий потенциал лидерства. Ориентирован на результат, устойчив в стрессовых ситуациях. Хорошо работает в условиях неопределённости.",
+        strengths: "Стратегическое мышление, высокая устойчивость, ориентация на достижения, способность вдохновлять команду",
+        risks: "Возможная нетерпимость к медленным исполнителям, склонность к микроменеджменту в кризис",
+        leadershipStyle: "Трансформационный. Ставит амбициозные цели, требователен к себе и команде, открыт к инновациям.",
+      },
+    });
+    await prisma.assessment.upsert({
+      where: { candidateProfileId_type: { candidateProfileId: cfo1Profile.id, type: "DISC" } },
+      update: {},
+      create: {
+        candidateProfileId: cfo1Profile.id,
+        type: "DISC",
+        status: "COMPLETED",
+        completedAt: new Date("2025-11-20"),
+        summary: "Доминирующий профиль DC. Решителен, результатоориентирован, компетентен в решении сложных задач.",
+        strengths: "Быстрое принятие решений, прямая коммуникация, высокая продуктивность под давлением",
+        risks: "Может восприниматься как резкий, недооценивает эмоциональный фактор в коммуникации",
+        leadershipStyle: "Директивный с элементами анализа. D/C профиль (79/68).",
+      },
+    });
+  }
+
+  if (cto1Profile) {
+    await prisma.assessment.upsert({
+      where: { candidateProfileId_type: { candidateProfileId: cto1Profile.id, type: "MBTI" } },
+      update: {},
+      create: {
+        candidateProfileId: cto1Profile.id,
+        type: "MBTI",
+        status: "COMPLETED",
+        completedAt: new Date("2025-12-01"),
+        summary: "INTJ — «Архитектор». Стратегический мыслитель с высокими стандартами. Прекрасно подходит для роли технологического лидера.",
+        strengths: "Системное мышление, независимость суждений, долгосрочное планирование, высокие стандарты качества",
+        risks: "Может быть непреклонным, сложно идёт на компромисс, высокие ожидания от команды",
+        leadershipStyle: "Визионерский. Строит системы и процессы, делегирует тактику, сохраняет контроль над стратегией.",
+      },
+    });
+  }
+
   console.log("✅ Готово! Аккаунты (пароль: password123):");
   console.log("  admin@ubxec.ru      — администратор");
   console.log("  cfo@example.ru      — кандидат CFO (верифицирован, Финансы)");
