@@ -8,6 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
+const ENGAGEMENT_OPTIONS = [
+  { value: "full-time", label: "Найм в штат (full-time)" },
+  { value: "mentor", label: "Ментор для CEO / команды" },
+  { value: "consultant", label: "Консультант / Part-time advisor" },
+  { value: "board", label: "Advisory Board" },
+];
+
 export default async function CandidateOnboarding() {
   const session = await auth();
   if (!session) redirect("/auth/login");
@@ -27,18 +34,42 @@ export default async function CandidateOnboarding() {
   return (
     <div className="min-h-screen bg-muted/30 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold">Создайте свой профиль</h1>
-          <p className="text-muted-foreground mt-2">
-            Ваши контактные данные остаются скрытыми — компании видят только профессиональную информацию
+
+        {/* Header */}
+        <div className="mb-8 text-center space-y-3">
+          <div className="inline-flex items-center gap-2 text-xs text-muted-foreground bg-background border rounded-full px-3 py-1">
+            <span className="w-4 h-4 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">1</span>
+            Шаг 1 из 1 — Профессиональный профиль
+          </div>
+          <h1 className="text-3xl font-bold">Создайте профиль кандидата</h1>
+          <p className="text-muted-foreground">
+            Ваши контактные данные остаются скрытыми — компании видят только профессиональную информацию.
+            После верификации вы начнёте получать мэтчи с релевантными позициями.
           </p>
+        </div>
+
+        {/* What happens next */}
+        <div className="grid grid-cols-3 gap-3 mb-8">
+          {[
+            { step: "1", label: "Заполните профиль", desc: "Сейчас" },
+            { step: "2", label: "Верификация", desc: "До 24 часов" },
+            { step: "3", label: "Получайте мэтчи", desc: "После верификации" },
+          ].map(({ step, label, desc }) => (
+            <div key={step} className="text-center p-3 rounded-lg bg-background border text-sm">
+              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center mx-auto mb-1.5">
+                {step}
+              </div>
+              <p className="font-medium text-sm">{label}</p>
+              <p className="text-xs text-muted-foreground">{desc}</p>
+            </div>
+          ))}
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle>Профессиональная информация</CardTitle>
             <CardDescription>
-              Эти данные используются для подбора релевантных позиций
+              Эти данные используются AI для подбора релевантных позиций. Контакты добавляются отдельно в профиле.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -57,10 +88,10 @@ export default async function CandidateOnboarding() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="industry">Отрасль *</Label>
-                  <Input id="industry" name="industry" placeholder="Финтех, Ритейл..." required />
+                  <Input id="industry" name="industry" placeholder="Финтех, Ритейл, Промышленность..." required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="yearsExperience">Лет опыта *</Label>
+                  <Label htmlFor="yearsExperience">Лет опыта на C-level *</Label>
                   <Input id="yearsExperience" name="yearsExperience" type="number" min={1} max={50} placeholder="10" required />
                 </div>
               </div>
@@ -74,38 +105,41 @@ export default async function CandidateOnboarding() {
                   placeholder="Вывел компанию на IPO, управлял P&L > 5 млрд руб., масштабировал команду с 20 до 150..."
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  Используйте конкретные цифры и результаты — это повышает качество мэтчинга
+                </p>
               </div>
 
               <div className="space-y-2">
                 <Label>Ожидания по компенсации (руб/год) *</Label>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <Label htmlFor="salaryMin" className="text-xs text-muted-foreground">От</Label>
-                    <Input id="salaryMin" name="salaryMin" type="number" placeholder="10000000" required />
+                    <Input id="salaryMin" name="salaryMin" type="number" placeholder="10 000 000" required />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <Label htmlFor="salaryMax" className="text-xs text-muted-foreground">До</Label>
-                    <Input id="salaryMax" name="salaryMax" type="number" placeholder="20000000" required />
+                    <Input id="salaryMax" name="salaryMax" type="number" placeholder="20 000 000" required />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="locationPref">Предпочтения по локации *</Label>
-                <Input id="locationPref" name="locationPref" placeholder="Москва, Удалённо..." required />
+                <Input id="locationPref" name="locationPref" placeholder="Москва, Удалённо, Москва / Удалённо..." required />
               </div>
 
               <div className="space-y-3">
                 <Label>Форматы взаимодействия *</Label>
-                <p className="text-xs text-muted-foreground">Выберите один или несколько форматов, в которых вы готовы работать</p>
+                <p className="text-xs text-muted-foreground">
+                  Выберите один или несколько форматов — это влияет на то, какие позиции вы будете видеть
+                </p>
                 <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { value: "full-time", label: "Найм в штат (full-time)" },
-                    { value: "mentor", label: "Ментор" },
-                    { value: "consultant", label: "Консультант / Advisor" },
-                    { value: "board", label: "Advisory Board" },
-                  ].map(({ value, label }) => (
-                    <label key={value} className="flex items-center gap-2 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors">
+                  {ENGAGEMENT_OPTIONS.map(({ value, label }) => (
+                    <label
+                      key={value}
+                      className="flex items-center gap-2 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors"
+                    >
                       <input
                         type="checkbox"
                         name="engagementFormats"
@@ -119,12 +153,28 @@ export default async function CandidateOnboarding() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" size="lg">
-                Создать профиль и перейти к мэтчам
-              </Button>
+              <div className="pt-2 space-y-3">
+                <Button type="submit" className="w-full" size="lg">
+                  Создать профиль и отправить на верификацию
+                </Button>
+                <p className="text-center text-xs text-muted-foreground">
+                  После верификации командой UbXec (до 24 ч) вы получите первые мэтчи
+                </p>
+              </div>
             </form>
           </CardContent>
         </Card>
+
+        {/* Privacy note */}
+        <div className="mt-6 p-4 rounded-lg border bg-background text-sm space-y-1">
+          <p className="font-medium flex items-center gap-2">
+            <span>🔒</span> Конфиденциальность
+          </p>
+          <p className="text-muted-foreground text-xs">
+            Компании видят только профессиональную информацию. Ваше имя, контакты и текущее место работы
+            остаются скрытыми до тех пор, пока обе стороны не подтвердят взаимный интерес.
+          </p>
+        </div>
       </div>
     </div>
   );
