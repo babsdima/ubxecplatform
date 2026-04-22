@@ -22,7 +22,7 @@ export default async function CompanyProfilePage() {
         <div className="max-w-2xl mx-auto px-5 pt-10 pb-2 relative z-10 flex items-end justify-between gap-4">
           <div>
             <p className="text-xs font-bold tracking-widest uppercase mb-2"
-              style={{ color: "hsl(38 52% 55%)" }}>Компания</p>
+              style={{ color: "rgba(255,255,255,0.35)" }}>Компания</p>
             <h1
               className="text-3xl font-bold tracking-tight"
               style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
@@ -34,7 +34,7 @@ export default async function CompanyProfilePage() {
             <span className="badge-verified mb-1 shrink-0">Верифицирована</span>
           ) : (
             <span className="text-xs font-semibold px-3 py-1.5 rounded-full shrink-0 mb-1"
-              style={{ background: "rgba(217,119,6,0.15)", color: "hsl(38 72% 70%)", border: "1px solid rgba(217,119,6,0.3)" }}>
+              style={{ background: "var(--warning-bg)", color: "var(--warning)", border: "1px solid var(--warning-border)" }}>
               На проверке
             </span>
           )}

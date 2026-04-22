@@ -55,7 +55,7 @@ export async function CompanyNav({ active }: { active: ActiveTab }) {
           className="font-bold text-xl tracking-tight shrink-0"
           style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
         >
-          Ub<span style={{ color: "hsl(38 52% 55%)" }}>X</span>ec
+          Ub<span style={{ color: "var(--accent)" }}>X</span>ec
         </Link>
 
         {/* Nav links */}
@@ -76,7 +76,7 @@ export async function CompanyNav({ active }: { active: ActiveTab }) {
                 {badge !== undefined && (
                   typeof badge === "number" ? (
                     <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold leading-none"
-                      style={{ background: "hsl(38 52% 55%)", color: "#fff" }}>
+                      style={{ background: "var(--accent)", color: "#fff" }}>
                       {badge > 9 ? "9+" : badge}
                     </span>
                   ) : (

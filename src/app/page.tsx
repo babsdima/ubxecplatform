@@ -10,7 +10,6 @@ import {
   Zap,
   Users,
   ShieldCheck,
-  TrendingUp,
   Clock,
   BadgeCheck,
   Building2,
@@ -22,6 +21,9 @@ import {
   Target,
   MessageSquare,
   Briefcase,
+  Route,
+  ClipboardList,
+  FileText,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -46,34 +48,40 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
+    <div className="min-h-screen flex flex-col" style={{ fontFamily: "var(--font-sans)" }}>
 
       {/* ── NAV ─────────────────────────────────────────────────────────── */}
       <header
-        className="sticky top-0 z-50 border-b"
-        style={{ background: "hsl(222 47% 7%)", borderColor: "rgba(255,255,255,0.07)" }}
+        className="sticky top-0 z-50"
+        style={{ background: "hsl(var(--ink-800))", borderBottom: "1px solid rgba(255,255,255,0.07)" }}
       >
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-7 h-16 flex items-center justify-between">
           <span
-            className="text-xl font-bold tracking-tight"
-            style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+            style={{ fontFamily: "var(--font-display)", fontSize: 21, fontWeight: 700, color: "hsl(var(--warm-white))", letterSpacing: "-0.01em" }}
           >
-            UbXec
+            Ub<span style={{ color: "var(--accent)" }}>X</span>ec
           </span>
-          <nav className="flex gap-2 items-center">
-            <Link href="/pricing" className="nav-ghost-link px-4 py-2 text-sm rounded-lg transition-colors">
+          <nav className="flex gap-0.5 items-center">
+            <Link
+              href="/pricing"
+              className="flex items-center gap-1.5 text-sm px-3.5 py-2 rounded-lg transition-colors"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+            >
               Тарифы
             </Link>
-            <Link href="/auth/login" className="nav-ghost-link px-4 py-2 text-sm rounded-lg transition-colors">
+            <Link
+              href="/auth/login"
+              className="flex items-center gap-1.5 text-sm px-3.5 py-2 rounded-lg transition-colors"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+            >
               Войти
             </Link>
             <Link
               href="/auth/register"
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-all"
-              style={{ background: "hsl(38 52% 48%)", color: "#fff" }}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-lg transition-all"
+              style={{ background: "var(--accent)", color: "#fff" }}
             >
-              Начать
-              <ChevronRight size={14} />
+              Начать <ChevronRight size={14} />
             </Link>
           </nav>
         </div>
@@ -84,27 +92,36 @@ export default async function Home() {
         {/* ── HERO ──────────────────────────────────────────────────────── */}
         <section
           className="relative overflow-hidden hero-grid"
-          style={{ background: "hsl(222 47% 7%)", minHeight: "calc(100vh - 64px)", display: "flex", alignItems: "center" }}
+          style={{ background: "hsl(var(--ink-800))", minHeight: "calc(100vh - 64px)", display: "flex", alignItems: "center" }}
         >
+          {/* Accent glow */}
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(184,149,90,0.12), transparent)" }}
+            style={{ backgroundImage: "radial-gradient(ellipse 80% 50% at 50% -10%, var(--accent-glow), transparent)" }}
+          />
+          {/* Ambient glow right */}
+          <div
+            className="absolute pointer-events-none"
+            style={{ right: "-10%", top: "10%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, var(--accent-glow-strong) 0%, transparent 65%)" }}
           />
 
-          <div className="relative max-w-6xl mx-auto px-6 py-28 w-full">
-            <div className="max-w-3xl">
-              {/* Eyebrow */}
+          <div className="relative max-w-6xl mx-auto px-7 py-20 w-full">
+            <div style={{ maxWidth: 680 }}>
+
+              {/* Eyebrow — neutral, not accent */}
               <div
                 className="inline-flex items-center gap-2 mb-8 animate-fade-up"
                 style={{
-                  border: "1px solid rgba(184,149,90,0.3)",
+                  border: "1px solid rgba(255,255,255,0.10)",
                   borderRadius: "100px",
-                  padding: "6px 16px",
-                  background: "rgba(184,149,90,0.08)",
+                  padding: "6px 16px 6px 10px",
+                  background: "rgba(255,255,255,0.04)",
                 }}
               >
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: "hsl(38 52% 60%)" }} />
-                <span className="text-xs font-medium tracking-widest uppercase" style={{ color: "hsl(38 60% 72%)" }}>
+                <span className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
+                  <Sparkles size={11} color="rgba(255,255,255,0.5)" />
+                </span>
+                <span className="text-[10px] font-bold tracking-[0.10em] uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>
                   Premium AI-powered Executive Search
                 </span>
               </div>
@@ -113,275 +130,67 @@ export default async function Home() {
               <h1
                 className="animate-fade-up-delay-1"
                 style={{
-                  fontFamily: "var(--font-playfair), Georgia, serif",
-                  fontSize: "clamp(2.8rem, 6vw, 5rem)",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(3rem, 7vw, 5.5rem)",
                   fontWeight: 700,
-                  lineHeight: 1.1,
-                  letterSpacing: "-0.02em",
-                  color: "hsl(40 33% 96%)",
-                  marginBottom: "1.5rem",
+                  lineHeight: 1.08,
+                  letterSpacing: "-0.03em",
+                  color: "hsl(var(--warm-white))",
+                  marginBottom: "3.5rem",
                 }}
               >
-                Executive Search
-                <br />
-                <span style={{ color: "hsl(38 52% 55%)", fontStyle: "italic" }}>нового поколения</span>
+                Executive<br />
+                Search<br />
+                <span style={{ color: "var(--accent)", fontStyle: "italic", display: "inline-block", paddingBottom: "0.35em" }}>
+                  нового&thinsp;поколения
+                </span>
               </h1>
 
               <p
                 className="animate-fade-up-delay-2"
                 style={{
-                  fontSize: "1.125rem",
-                  lineHeight: 1.7,
-                  color: "rgba(255,255,255,0.5)",
-                  maxWidth: "560px",
-                  marginBottom: "2.5rem",
+                  fontSize: "1.0625rem",
+                  lineHeight: 1.78,
+                  color: "rgba(255,255,255,0.42)",
+                  maxWidth: 480,
+                  marginBottom: "2.25rem",
                 }}
               >
                 Премиальная платформа для confidential найма топ-менеджеров.
-                AI-powered мэтчинг с учётом assessment-профиля. Полная конфиденциальность
-                до момента взаимного интереса обеих сторон.
+                AI-powered мэтчинг с учётом assessment-профиля.
               </p>
 
-              <div className="flex flex-wrap gap-3 animate-fade-up-delay-3">
+              <div className="flex flex-wrap gap-3 mb-8 animate-fade-up-delay-3">
+                {/* Primary CTA — accent */}
                 <Link
                   href="/auth/register?role=CANDIDATE"
-                  className="group flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all"
-                  style={{ background: "hsl(40 33% 96%)", color: "hsl(222 47% 8%)" }}
+                  className="inline-flex items-center gap-2 rounded-xl text-sm font-bold transition-all"
+                  style={{ padding: "14px 26px", background: "var(--accent)", color: "#fff" }}
                 >
                   <UserCircle size={16} />
                   Я топ-менеджер
-                  <span className="group-hover:translate-x-0.5 transition-transform inline-block">→</span>
                 </Link>
+                {/* Secondary CTA — ghost */}
                 <Link
                   href="/auth/register?role=COMPANY"
-                  className="flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all"
-                  style={{
-                    border: "1px solid rgba(255,255,255,0.15)",
-                    color: "rgba(255,255,255,0.75)",
-                    background: "rgba(255,255,255,0.04)",
-                  }}
+                  className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold transition-all"
+                  style={{ padding: "14px 22px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.72)", border: "1px solid rgba(255,255,255,0.12)" }}
                 >
-                  <Building2 size={16} />
+                  <Building2 size={16} color="rgba(255,255,255,0.55)" />
                   Ищу руководителя
                 </Link>
               </div>
 
-              <p className="mt-5 text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
-                Бесплатно для кандидатов · Confidential search · Верификация каждого профиля
-              </p>
-            </div>
-          </div>
-
-          <div
-            className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-            style={{ background: "linear-gradient(to bottom, transparent, hsl(222 47% 7%))" }}
-          />
-        </section>
-
-        {/* ── STATS STRIP ───────────────────────────────────────────────── */}
-        <section
-          style={{
-            background: "hsl(222 47% 9%)",
-            borderTop: "1px solid rgba(255,255,255,0.06)",
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
-          }}
-        >
-          <div className="max-w-6xl mx-auto px-6 py-8">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
-              {[
-                { value: "AI", label: "powered matching", icon: <Brain size={16} /> },
-                { value: "100%", label: "confidential search", icon: <EyeOff size={16} /> },
-                { value: "Assessed", label: "verified candidates", icon: <BadgeCheck size={16} /> },
-                { value: "48ч", label: "до первого мэтча", icon: <Clock size={16} /> },
-              ].map(({ value, label, icon }) => (
-                <div key={label}>
-                  <div className="flex justify-center mb-2" style={{ color: "rgba(255,255,255,0.2)" }}>
-                    {icon}
-                  </div>
-                  <p
-                    style={{
-                      fontFamily: "var(--font-playfair), Georgia, serif",
-                      fontSize: "1.75rem",
-                      fontWeight: 700,
-                      color: "hsl(38 52% 55%)",
-                      lineHeight: 1,
-                      marginBottom: "6px",
-                    }}
-                  >
-                    {value}
-                  </p>
-                  <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.35)", letterSpacing: "0.05em" }}>
-                    {label}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── HOW IT WORKS ──────────────────────────────────────────────── */}
-        <section className="py-28 px-6 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <div className="max-w-xl mb-16">
-              <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: "hsl(38 52% 48%)" }}>
-                Процесс
-              </p>
-              <h2
-                style={{
-                  fontFamily: "var(--font-playfair), Georgia, serif",
-                  fontSize: "clamp(2rem, 4vw, 2.75rem)",
-                  fontWeight: 700,
-                  lineHeight: 1.2,
-                  letterSpacing: "-0.02em",
-                  color: "hsl(222 47% 8%)",
-                }}
-              >
-                От регистрации до предложения — три шага
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ background: "hsl(220 13% 91%)" }}>
-              {[
-                {
-                  n: "01",
-                  icon: <UserCircle size={28} />,
-                  title: "Confidential профиль",
-                  body: "Кандидат описывает опыт, достижения и форматы взаимодействия без раскрытия имени. Компания создаёт запрос с требованиями и вилкой компенсации.",
-                  detail: "Каждый профиль верифицируется командой UbXec",
-                },
-                {
-                  n: "02",
-                  icon: <Brain size={28} />,
-                  title: "AI анализирует совместимость",
-                  body: "Алгоритм сопоставляет кандидатов и запросы по опыту, индустрии, компенсации и assessment-профилю. Учитывает формат взаимодействия: найм, ментор, консультант, Advisory Board.",
-                  detail: "Обе стороны видят только профессиональные данные",
-                },
-                {
-                  n: "03",
-                  icon: <Handshake size={28} />,
-                  title: "Взаимный интерес — прямой контакт",
-                  body: "Когда обе стороны отметили интерес — контакты раскрываются. Прямой диалог без посредников и агентских комиссий.",
-                  detail: "Email-уведомление в момент раскрытия",
-                },
-              ].map(({ n, icon, title, body, detail }) => (
-                <div key={n} className="group p-10 bg-white transition-all duration-300 hover:bg-stone-50">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors group-hover:bg-stone-100"
-                      style={{ background: "hsl(220 14% 95%)", color: "hsl(38 52% 48%)" }}
-                    >
-                      {icon}
-                    </div>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-playfair), Georgia, serif",
-                        fontSize: "2.5rem",
-                        fontWeight: 700,
-                        color: "hsl(220 13% 91%)",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {n}
-                    </span>
-                  </div>
-                  <h3 style={{ fontSize: "1.0625rem", fontWeight: 600, color: "hsl(222 47% 8%)", marginBottom: "0.75rem", lineHeight: 1.3 }}>
-                    {title}
-                  </h3>
-                  <p style={{ fontSize: "0.875rem", color: "hsl(220 9% 46%)", lineHeight: 1.7, marginBottom: "1rem" }}>
-                    {body}
-                  </p>
-                  <p style={{ fontSize: "0.75rem", color: "hsl(38 52% 48%)", fontWeight: 500 }}>
-                    — {detail}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── ASSESSMENT SECTION ────────────────────────────────────────── */}
-        <section
-          className="py-28 px-6"
-          style={{ background: "hsl(222 47% 7%)" }}
-        >
-          <div className="max-w-6xl mx-auto">
-            <div
-              className="absolute pointer-events-none"
-              style={{
-                background: "radial-gradient(ellipse 60% 60% at 70% 50%, rgba(184,149,90,0.07), transparent)",
-                inset: 0,
-              }}
-            />
-            <div className="grid md:grid-cols-2 gap-16 items-center">
-              <div>
-                <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: "hsl(38 60% 62%)" }}>
-                  Assessment-driven
-                </p>
-                <h2
-                  style={{
-                    fontFamily: "var(--font-playfair), Georgia, serif",
-                    fontSize: "clamp(2rem, 4vw, 2.75rem)",
-                    fontWeight: 700,
-                    lineHeight: 1.2,
-                    letterSpacing: "-0.02em",
-                    color: "hsl(40 33% 96%)",
-                    marginBottom: "1.5rem",
-                  }}
-                >
-                  Не просто профиль —
-                  <br />
-                  <span style={{ color: "hsl(38 52% 55%)", fontStyle: "italic" }}>оценённый руководитель</span>
-                </h2>
-                <p style={{ fontSize: "0.9375rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8, marginBottom: "2rem" }}>
-                  Каждый кандидат проходит профессиональный assessment. AI генерирует flash-report
-                  с управленческим профилем, сильными сторонами и рисками. Компании видят
-                  не только опыт, но и стиль лидерства.
-                </p>
-                <div className="space-y-3">
-                  {[
-                    { icon: <Brain size={15} />, text: "DISC, MBTI, Hogan — стандарты мировой практики" },
-                    { icon: <Award size={15} />, text: "AI flash-report с интерпретацией для каждого кандидата" },
-                    { icon: <Target size={15} />, text: "Совместимость кандидата и CEO по Hogan-профилю" },
-                    { icon: <BarChart3 size={15} />, text: "Фильтрация по assessment-параметрам и управленческому стилю" },
-                  ].map(({ icon, text }) => (
-                    <div key={text} className="flex items-start gap-3">
-                      <span
-                        className="mt-0.5 shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
-                        style={{ background: "rgba(184,149,90,0.15)", color: "hsl(38 60% 62%)" }}
-                      >
-                        {icon}
-                      </span>
-                      <span style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>{text}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+              {/* Trust signals — neutral */}
+              <div className="flex items-center gap-5 flex-wrap">
                 {[
-                  { label: "Flash-report", desc: "AI-интерпретация assessment за 24 часа", icon: <Zap size={20} /> },
-                  { label: "Hogan Compatibility", desc: "Анализ совместимости с CEO компании", icon: <Target size={20} /> },
-                  { label: "Management Style", desc: "Стиль лидерства и принятия решений", icon: <Brain size={20} /> },
-                  { label: "Deep-dive Session", desc: "Разбор результатов с ассессором", icon: <MessageSquare size={20} /> },
-                ].map(({ label, desc, icon }) => (
-                  <div
-                    key={label}
-                    className="rounded-xl p-5"
-                    style={{
-                      background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                    }}
-                  >
-                    <div
-                      className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"
-                      style={{ background: "rgba(184,149,90,0.12)", color: "hsl(38 60% 62%)" }}
-                    >
-                      {icon}
-                    </div>
-                    <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "hsl(40 33% 92%)", marginBottom: "0.375rem" }}>
-                      {label}
-                    </p>
-                    <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.35)", lineHeight: 1.5 }}>{desc}</p>
+                  { icon: <ShieldCheck size={13} color="rgba(255,255,255,0.22)" />, label: "Бесплатно для кандидатов" },
+                  { icon: <EyeOff size={13} color="rgba(255,255,255,0.22)" />,      label: "Confidential search" },
+                  { icon: <BadgeCheck size={13} color="rgba(255,255,255,0.22)" />,  label: "Верификация профиля" },
+                ].map(({ icon, label }) => (
+                  <div key={label} className="flex items-center gap-1.5">
+                    {icon}
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.28)" }}>{label}</span>
                   </div>
                 ))}
               </div>
@@ -389,71 +198,214 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* ── FOR WHO ───────────────────────────────────────────────────── */}
-        <section className="py-28 px-6" style={{ background: "hsl(220 14% 97%)" }}>
+        {/* ── STATS STRIP ───────────────────────────────────────────────── */}
+        <section
+          style={{
+            background: "hsl(var(--ink-700))",
+            borderTop: "1px solid rgba(255,255,255,0.06)",
+            borderBottom: "1px solid rgba(255,255,255,0.06)",
+          }}
+        >
+          <div className="max-w-6xl mx-auto px-7 py-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-0">
+              {[
+                { icon: <Brain size={15} color="rgba(255,255,255,0.35)" />,      v: "AI",       l: "powered matching" },
+                { icon: <EyeOff size={15} color="rgba(255,255,255,0.35)" />,     v: "100%",     l: "confidential search" },
+                { icon: <BadgeCheck size={15} color="rgba(255,255,255,0.35)" />, v: "Assessed", l: "verified candidates" },
+                { icon: <Clock size={15} color="rgba(255,255,255,0.35)" />,      v: "48ч",      l: "до первого мэтча" },
+              ].map(({ icon, v, l }, i) => (
+                <div key={l} className="text-center px-4 py-1" style={{ borderRight: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                  <div className="flex justify-center mb-2.5">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(255,255,255,0.05)" }}>
+                      {icon}
+                    </div>
+                  </div>
+                  {/* Stat value — accent (brand expression) */}
+                  <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", fontWeight: 700, color: "var(--accent)", lineHeight: 1, marginBottom: 5 }}>{v}</p>
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", letterSpacing: "0.04em" }}>{l}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── HOW IT WORKS ──────────────────────────────────────────────── */}
+        <section className="py-28 px-7 bg-white">
           <div className="max-w-6xl mx-auto">
-            <div className="max-w-xl mb-16">
-              <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: "hsl(38 52% 48%)" }}>
+            <div style={{ maxWidth: 580, marginBottom: 56 }}>
+              {/* Eyebrow — slate */}
+              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] uppercase mb-3.5" style={{ color: "#94a3b8" }}>
+                <Route size={11} color="#94a3b8" />Процесс
+              </p>
+              <h2
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(2rem, 4vw, 3rem)",
+                  fontWeight: 700,
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.025em",
+                  color: "hsl(var(--ink-800))",
+                }}
+              >
+                От регистрации до предложения — три шага
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ background: "hsl(var(--neutral-200))" }}>
+              {[
+                { icon: <UserCircle size={22} color="#475569" />, n: "01", title: "Confidential профиль",           body: "Опишите опыт без раскрытия имени. Компания создаёт запрос с требованиями. Каждый профиль верифицируется командой UbXec.",                              detail: "Верификация в течение 24 часов" },
+                { icon: <Brain size={22} color="#475569" />,      n: "02", title: "AI анализирует совместимость",   body: "Алгоритм сопоставляет по опыту, индустрии, assessment-профилю и формату. Обе стороны видят только профессиональные данные.",                          detail: "DISC · MBTI · Hogan" },
+                { icon: <Handshake size={22} color="#475569" />,  n: "03", title: "Взаимный интерес — прямой контакт", body: "Когда обе стороны отметили интерес — контакты раскрываются. Прямой диалог без посредников и комиссий.", detail: "Email-уведомление мгновенно" },
+              ].map(({ icon, n, title, body, detail }) => (
+                <div key={n} className="bg-white p-11 flex flex-col">
+                  <div className="flex items-start justify-between mb-6">
+                    {/* Icon box — neutral */}
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: "hsl(var(--neutral-100))" }}>
+                      {icon}
+                    </div>
+                    <span style={{ fontFamily: "var(--font-display)", fontSize: "3rem", fontWeight: 700, color: "hsl(var(--neutral-200))", lineHeight: 1, letterSpacing: "-0.03em" }}>{n}</span>
+                  </div>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "hsl(var(--ink-800))", marginBottom: 10, lineHeight: 1.3 }}>{title}</h3>
+                  <p style={{ fontSize: 13, color: "hsl(var(--neutral-500))", lineHeight: 1.78, flex: 1 }}>{body}</p>
+                  <div className="flex items-center gap-1.5 mt-5">
+                    <BadgeCheck size={12} color="#94a3b8" />
+                    <p style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── ASSESSMENT ────────────────────────────────────────────────── */}
+        <section className="py-28 px-7 relative overflow-hidden" style={{ background: "hsl(var(--ink-800))" }}>
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: "radial-gradient(ellipse 50% 70% at 75% 50%, rgba(255,255,255,0.025), transparent)" }}
+          />
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-[72px] items-center relative">
+            <div>
+              {/* Eyebrow — neutral on dark */}
+              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] uppercase mb-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+                <ClipboardList size={11} color="rgba(255,255,255,0.3)" />Assessment-driven
+              </p>
+              <h2
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(2rem, 4vw, 3rem)",
+                  fontWeight: 700,
+                  lineHeight: 1.22,
+                  letterSpacing: "-0.025em",
+                  color: "hsl(var(--warm-white))",
+                  marginBottom: 48,
+                }}
+              >
+                Не просто профиль —<br />
+                <span style={{ color: "var(--accent)", fontStyle: "italic", display: "inline-block", paddingBottom: "0.5em" }}>оценённый руководитель</span>
+              </h2>
+              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.40)", lineHeight: 1.8, marginBottom: 32 }}>
+                Каждый кандидат проходит профессиональный assessment. AI генерирует flash-report
+                с управленческим профилем, сильными сторонами и рисками.
+              </p>
+              <div className="flex flex-col gap-3.5">
+                {[
+                  { icon: <Brain size={14} color="rgba(255,255,255,0.4)" />,    text: "DISC, MBTI, Hogan — стандарты мировой практики" },
+                  { icon: <FileText size={14} color="rgba(255,255,255,0.4)" />, text: "AI flash-report с интерпретацией профиля" },
+                  { icon: <Target size={14} color="rgba(255,255,255,0.4)" />,   text: "Совместимость кандидата и CEO по Hogan" },
+                  { icon: <BarChart3 size={14} color="rgba(255,255,255,0.4)" />,text: "Фильтрация по management style" },
+                ].map(({ icon, text }) => (
+                  <div key={text} className="flex items-center gap-3">
+                    {/* Icon box — muted, neutral */}
+                    <div className="w-[30px] h-[30px] rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      {icon}
+                    </div>
+                    <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>{text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3.5">
+              {[
+                { icon: <Zap size={18} color="rgba(255,255,255,0.5)" />,           label: "Flash-report",       desc: "AI-интерпретация за 24 часа" },
+                { icon: <Target size={18} color="rgba(255,255,255,0.5)" />,        label: "Hogan Compatibility", desc: "Совместимость с CEO" },
+                { icon: <Brain size={18} color="rgba(255,255,255,0.5)" />,         label: "Management Style",   desc: "Стиль лидерства и решений" },
+                { icon: <MessageSquare size={18} color="rgba(255,255,255,0.5)" />, label: "Deep-dive Session",  desc: "Разбор с ассессором" },
+              ].map(({ icon, label, desc }) => (
+                <div key={label} className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <div className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center mb-4" style={{ background: "rgba(255,255,255,0.07)" }}>
+                    {icon}
+                  </div>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: "hsl(40 33% 92%)", marginBottom: 5 }}>{label}</p>
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", lineHeight: 1.55 }}>{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── FOR WHO ───────────────────────────────────────────────────── */}
+        <section className="py-28 px-7" style={{ background: "hsl(var(--neutral-50))" }}>
+          <div className="max-w-6xl mx-auto">
+            <div style={{ maxWidth: 560, marginBottom: 56 }}>
+              <p className="text-[10px] font-bold tracking-[0.12em] uppercase mb-3.5" style={{ color: "#94a3b8" }}>
                 Аудитория
               </p>
               <h2
                 style={{
-                  fontFamily: "var(--font-playfair), Georgia, serif",
-                  fontSize: "clamp(2rem, 4vw, 2.75rem)",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(2rem, 4vw, 3rem)",
                   fontWeight: 700,
-                  lineHeight: 1.2,
-                  letterSpacing: "-0.02em",
-                  color: "hsl(222 47% 8%)",
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.025em",
+                  color: "hsl(var(--ink-800))",
                 }}
               >
-                Создан для лидеров,
-                <br />ценящих конфиденциальность
+                Создан для лидеров,<br />ценящих конфиденциальность
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Candidates */}
-              <div className="relative overflow-hidden rounded-2xl p-10" style={{ background: "hsl(222 47% 7%)" }}>
+              <div className="relative overflow-hidden rounded-2xl p-10" style={{ background: "hsl(var(--ink-800))" }}>
                 <div
                   className="absolute top-0 right-0 w-48 h-48 pointer-events-none"
-                  style={{ background: "radial-gradient(circle, rgba(184,149,90,0.15), transparent 70%)" }}
+                  style={{ background: "radial-gradient(circle, var(--accent-glow-strong), transparent 70%)" }}
                 />
                 <div
-                  className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
-                  style={{ background: "rgba(184,149,90,0.12)", color: "hsl(38 60% 62%)" }}
+                  className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.10em] uppercase"
+                  style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.10)" }}
                 >
-                  <UserCircle size={13} />
+                  <UserCircle size={13} color="rgba(255,255,255,0.45)" />
                   Для топ-менеджеров
                 </div>
                 <h3
                   style={{
-                    fontFamily: "var(--font-playfair), Georgia, serif",
+                    fontFamily: "var(--font-display)",
                     fontSize: "1.75rem",
                     fontWeight: 700,
-                    color: "hsl(40 33% 96%)",
+                    color: "hsl(var(--warm-white))",
                     marginBottom: "0.75rem",
                     lineHeight: 1.2,
                   }}
                 >
-                  CEO, CFO, CTO, COO
-                  <br />и другие C-level роли
+                  CEO, CFO, CTO, COO<br />и другие C-level роли
                 </h3>
                 <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.35)", marginBottom: "1.5rem" }}>
                   Найм в штат · Ментор · Консультант · Advisory Board
                 </p>
                 <ul className="space-y-3 mb-8">
                   {[
-                    { icon: <Lock size={13} />, text: "Поиск без риска для текущей позиции" },
-                    { icon: <Brain size={13} />, text: "Бесплатный assessment и AI flash-report" },
-                    { icon: <ShieldCheck size={13} />, text: "Вы контролируете раскрытие данных" },
-                    { icon: <Sparkles size={13} />, text: "Только релевантные предложения" },
-                    { icon: <Briefcase size={13} />, text: "Несколько форматов: штат, ментор, advisory" },
+                    { icon: <Lock size={13} />,       text: "Поиск без риска для текущей позиции" },
+                    { icon: <Brain size={13} />,      text: "Бесплатный assessment и AI flash-report" },
+                    { icon: <ShieldCheck size={13} />,text: "Вы контролируете раскрытие данных" },
+                    { icon: <Sparkles size={13} />,   text: "Только релевантные предложения" },
+                    { icon: <Briefcase size={13} />,  text: "Несколько форматов: штат, ментор, advisory" },
                     { icon: <BadgeCheck size={13} />, text: "Бесплатно для кандидатов навсегда" },
                   ].map(({ icon, text }) => (
                     <li key={text} className="flex gap-3 items-start">
                       <span
                         className="mt-0.5 shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
-                        style={{ background: "rgba(184,149,90,0.15)", color: "hsl(38 60% 62%)" }}
+                        style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.5)" }}
                       >
                         {icon}
                       </span>
@@ -461,10 +413,11 @@ export default async function Home() {
                     </li>
                   ))}
                 </ul>
+                {/* CTA — accent */}
                 <Link
                   href="/auth/register?role=CANDIDATE"
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all hover:gap-3"
-                  style={{ background: "hsl(38 52% 48%)", color: "#fff" }}
+                  className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold transition-all hover:gap-3"
+                  style={{ padding: "12px 22px", background: "var(--accent)", color: "#fff" }}
                 >
                   Создать confidential профиль →
                 </Link>
@@ -473,55 +426,54 @@ export default async function Home() {
               {/* Companies */}
               <div
                 className="relative overflow-hidden rounded-2xl p-10 border"
-                style={{ background: "#fff", borderColor: "hsl(220 13% 91%)" }}
+                style={{ background: "#fff", borderColor: "hsl(var(--neutral-200))" }}
               >
                 <div
-                  className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
-                  style={{ background: "hsl(220 14% 94%)", color: "hsl(38 52% 42%)" }}
+                  className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.10em] uppercase"
+                  style={{ background: "hsl(var(--neutral-100))", color: "#64748b" }}
                 >
-                  <Building2 size={13} />
+                  <Building2 size={13} color="#64748b" />
                   Для компаний и фондов
                 </div>
                 <h3
                   style={{
-                    fontFamily: "var(--font-playfair), Georgia, serif",
+                    fontFamily: "var(--font-display)",
                     fontSize: "1.75rem",
                     fontWeight: 700,
-                    color: "hsl(222 47% 8%)",
+                    color: "hsl(var(--ink-800))",
                     marginBottom: "0.75rem",
                     lineHeight: 1.2,
                   }}
                 >
-                  Корпорации,
-                  <br />PE-фонды, стартапы
+                  Корпорации,<br />PE-фонды, стартапы
                 </h3>
-                <p style={{ fontSize: "0.8125rem", color: "hsl(220 9% 60%)", marginBottom: "1.5rem" }}>
+                <p style={{ fontSize: "0.8125rem", color: "hsl(var(--neutral-500))", marginBottom: "1.5rem" }}>
                   Найм в штат · Ментор для CEO · Консультант · Advisory Board
                 </p>
                 <ul className="space-y-3 mb-8">
                   {[
                     { icon: <Building2 size={13} />, text: "Поиск для портфельных и дочерних компаний" },
-                    { icon: <EyeOff size={13} />, text: "Скрытый поиск — не раскрывайте позицию публично" },
-                    { icon: <Brain size={13} />, text: "Assessment-driven — оценённые кандидаты с профилем" },
-                    { icon: <Target size={13} />, text: "Hogan compatibility с профилем CEO" },
-                    { icon: <Users size={13} />, text: "Доступ к пассивным C-level кандидатам" },
-                    { icon: <Zap size={13} />, text: "Фиксированный абонемент без % от зарплаты" },
+                    { icon: <EyeOff size={13} />,    text: "Скрытый поиск — не раскрывайте позицию публично" },
+                    { icon: <Brain size={13} />,     text: "Assessment-driven — оценённые кандидаты с профилем" },
+                    { icon: <Target size={13} />,    text: "Hogan compatibility с профилем CEO" },
+                    { icon: <Users size={13} />,     text: "Доступ к пассивным C-level кандидатам" },
+                    { icon: <Zap size={13} />,       text: "Фиксированный абонемент без % от зарплаты" },
                   ].map(({ icon, text }) => (
                     <li key={text} className="flex gap-3 items-start">
                       <span
                         className="mt-0.5 shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
-                        style={{ background: "hsl(220 14% 94%)", color: "hsl(222 47% 35%)" }}
+                        style={{ background: "hsl(var(--neutral-100))", color: "#64748b" }}
                       >
                         {icon}
                       </span>
-                      <span style={{ fontSize: "0.875rem", color: "hsl(220 9% 46%)", lineHeight: 1.6 }}>{text}</span>
+                      <span style={{ fontSize: "0.875rem", color: "hsl(var(--neutral-500))", lineHeight: 1.6 }}>{text}</span>
                     </li>
                   ))}
                 </ul>
                 <Link
                   href="/auth/register?role=COMPANY"
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all border hover:bg-stone-50"
-                  style={{ borderColor: "hsl(222 47% 8%)", color: "hsl(222 47% 8%)" }}
+                  className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold transition-all border hover:bg-slate-50"
+                  style={{ padding: "12px 22px", borderColor: "hsl(var(--ink-800))", color: "hsl(var(--ink-800))" }}
                 >
                   Разместить запрос →
                 </Link>
@@ -530,140 +482,115 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* ── QUOTE ─────────────────────────────────────────────────────── */}
-        <section className="py-28 px-6 bg-white">
-          <div className="max-w-3xl mx-auto text-center">
-            <p
-              style={{
-                fontFamily: "var(--font-playfair), Georgia, serif",
-                fontSize: "clamp(1.5rem, 3vw, 2.25rem)",
-                fontWeight: 600,
-                lineHeight: 1.4,
-                color: "hsl(222 47% 8%)",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              «Лучшие назначения происходят конфиденциально,
-              <br className="hidden sm:block" /> по взаимному выбору и на основе реальной оценки»
-            </p>
-            <div className="w-12 h-px mx-auto mt-8" style={{ background: "hsl(38 52% 48%)" }} />
-          </div>
-        </section>
-
         {/* ── DIFFERENTIATORS ───────────────────────────────────────────── */}
-        <section className="py-28 px-6" style={{ background: "hsl(220 14% 97%)" }}>
+        <section className="py-28 px-7" style={{ background: "hsl(var(--neutral-50))" }}>
           <div className="max-w-6xl mx-auto">
-            <div className="max-w-xl mb-16">
-              <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: "hsl(38 52% 48%)" }}>
-                Отличия
+            <div style={{ maxWidth: 560, marginBottom: 56 }}>
+              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] uppercase mb-3.5" style={{ color: "#94a3b8" }}>
+                <Award size={11} color="#94a3b8" />Отличия
               </p>
               <h2
                 style={{
-                  fontFamily: "var(--font-playfair), Georgia, serif",
-                  fontSize: "clamp(2rem, 4vw, 2.75rem)",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(2rem, 4vw, 3rem)",
                   fontWeight: 700,
-                  lineHeight: 1.2,
-                  letterSpacing: "-0.02em",
-                  color: "hsl(222 47% 8%)",
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.025em",
+                  color: "hsl(var(--ink-800))",
                 }}
               >
                 Почему UbXec — другой уровень
               </h2>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                {
-                  icon: <EyeOff size={22} />,
-                  title: "Confidential Search",
-                  body: "Двусторонняя конфиденциальность. Кандидат не раскрывает себя публично. Компания ведёт скрытый поиск. Контакты открываются только при взаимном интересе.",
-                },
-                {
-                  icon: <Brain size={22} />,
-                  title: "AI-powered & Assessment",
-                  body: "Мэтчинг учитывает не только опыт и компенсацию, но и assessment-профиль кандидата: управленческий стиль, DISC, Hogan. Точнее любого ручного подбора.",
-                },
-                {
-                  icon: <Award size={22} />,
-                  title: "Premium Community",
-                  body: "Только верифицированные C-level специалисты. Ручная проверка каждого профиля командой UbXec. Никаких случайных кандидатов — только реальный топ-уровень.",
-                },
+                { icon: <EyeOff size={22} color="#475569" />,    title: "Confidential Search",    body: "Двусторонняя анонимность. Контакты открываются только при взаимном интересе обеих сторон." },
+                { icon: <Brain size={22} color="#475569" />,     title: "AI-powered & Assessment", body: "Мэтчинг учитывает опыт, компенсацию и assessment-профиль. Точнее любого ручного подбора." },
+                { icon: <BadgeCheck size={22} color="#475569" />,title: "Premium Community",       body: "Только верифицированные C-level специалисты. Ручная проверка каждого профиля командой UbXec." },
               ].map(({ icon, title, body }) => (
                 <div
                   key={title}
-                  className="group rounded-2xl p-8 border bg-white transition-all hover:shadow-md hover:-translate-y-0.5 duration-200"
-                  style={{ borderColor: "hsl(220 13% 91%)" }}
+                  className="rounded-[18px] p-8 border bg-white transition-all hover:shadow-md hover:-translate-y-0.5 duration-200"
+                  style={{ borderColor: "hsl(var(--neutral-200))" }}
                 >
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
-                    style={{ background: "hsl(220 14% 95%)", color: "hsl(38 52% 48%)" }}
-                  >
+                  {/* Icon box — neutral */}
+                  <div className="w-[46px] h-[46px] rounded-[13px] flex items-center justify-center mb-5" style={{ background: "hsl(var(--neutral-100))" }}>
                     {icon}
                   </div>
-                  <h3 style={{ fontSize: "1rem", fontWeight: 600, color: "hsl(222 47% 8%)", marginBottom: "0.5rem" }}>
-                    {title}
-                  </h3>
-                  <p style={{ fontSize: "0.875rem", color: "hsl(220 9% 46%)", lineHeight: 1.7 }}>
-                    {body}
-                  </p>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "hsl(var(--ink-800))", marginBottom: 10 }}>{title}</h3>
+                  <p style={{ fontSize: 13, color: "hsl(var(--neutral-500))", lineHeight: 1.78 }}>{body}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
+        {/* ── QUOTE ─────────────────────────────────────────────────────── */}
+        <section className="py-20 px-7 bg-white text-center">
+          <div className="max-w-3xl mx-auto">
+            <p
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(1.4rem, 3vw, 2rem)",
+                fontWeight: 600,
+                lineHeight: 1.45,
+                color: "hsl(var(--ink-800))",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              «Лучшие назначения происходят конфиденциально,<br className="hidden sm:block" />
+              по взаимному выбору и на основе реальной оценки»
+            </p>
+            {/* Divider — neutral */}
+            <div className="w-10 h-0.5 mx-auto mt-7 rounded-full" style={{ background: "hsl(var(--neutral-200))" }} />
+          </div>
+        </section>
+
         {/* ── CTA ───────────────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden py-28 px-6" style={{ background: "hsl(222 47% 7%)" }}>
+        <section className="relative overflow-hidden py-28 px-7 text-center" style={{ background: "hsl(var(--ink-800))" }}>
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse 60% 80% at 50% 120%, rgba(184,149,90,0.1), transparent)" }}
+            style={{ background: "radial-gradient(ellipse 60% 80% at 50% 120%, var(--accent-glow), transparent)" }}
           />
-          <div className="relative max-w-2xl mx-auto text-center">
+          <div className="relative max-w-[560px] mx-auto">
+            {/* Icon box — neutral */}
             <div
-              className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-8"
-              style={{ background: "rgba(184,149,90,0.12)", color: "hsl(38 60% 62%)" }}
+              className="inline-flex items-center justify-center w-14 h-14 rounded-[18px] mb-7"
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}
             >
-              <Handshake size={26} />
+              <Handshake size={26} color="rgba(255,255,255,0.5)" />
             </div>
             <h2
               style={{
-                fontFamily: "var(--font-playfair), Georgia, serif",
+                fontFamily: "var(--font-display)",
                 fontSize: "clamp(2rem, 5vw, 3.5rem)",
                 fontWeight: 700,
-                lineHeight: 1.15,
-                letterSpacing: "-0.02em",
-                color: "hsl(40 33% 96%)",
-                marginBottom: "1.25rem",
+                lineHeight: 1.12,
+                letterSpacing: "-0.025em",
+                color: "hsl(var(--warm-white))",
+                marginBottom: 16,
               }}
             >
-              Готовы к следующему
-              <br />карьерному шагу?
+              Готовы к следующему<br />карьерному шагу?
             </h2>
-            <p style={{ fontSize: "1.0625rem", color: "rgba(255,255,255,0.45)", marginBottom: "2.5rem", lineHeight: 1.7 }}>
-              Регистрация занимает две минуты.
-              <br className="hidden sm:block" /> Верификация и assessment — в течение 24 часов.
+            <p style={{ fontSize: 15, color: "rgba(255,255,255,0.38)", marginBottom: 36, lineHeight: 1.78 }}>
+              Регистрация — две минуты. Верификация и assessment — 24 часа.
             </p>
             <div className="flex gap-3 justify-center flex-wrap">
+              {/* Primary CTA — accent */}
               <Link
                 href="/auth/register?role=CANDIDATE"
-                className="group flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all"
-                style={{ background: "hsl(38 52% 48%)", color: "#fff" }}
+                className="inline-flex items-center gap-2 rounded-xl text-sm font-bold transition-all"
+                style={{ padding: "14px 26px", background: "var(--accent)", color: "#fff" }}
               >
-                <UserCircle size={16} />
-                Я топ-менеджер
-                <span className="group-hover:translate-x-0.5 transition-transform inline-block">→</span>
+                <UserCircle size={16} />Я топ-менеджер
               </Link>
               <Link
                 href="/auth/register?role=COMPANY"
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all"
-                style={{
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  color: "rgba(255,255,255,0.7)",
-                  background: "rgba(255,255,255,0.04)",
-                }}
+                className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold transition-all"
+                style={{ padding: "14px 22px", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.65)", border: "1px solid rgba(255,255,255,0.12)" }}
               >
-                <Building2 size={16} />
-                Я компания
+                <Building2 size={16} color="rgba(255,255,255,0.5)" />Я компания
               </Link>
             </div>
           </div>
@@ -671,19 +598,17 @@ export default async function Home() {
       </main>
 
       {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-      <footer style={{ background: "hsl(222 47% 5%)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "rgba(255,255,255,0.35)", fontSize: "0.875rem" }}>
-            UbXec
-          </span>
-          <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.2)" }}>
-            © 2026 · Premium Executive Search Platform · Москва
-          </p>
+      <footer style={{ background: "hsl(var(--ink-900))", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <div className="max-w-6xl mx-auto px-7 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
+          <span style={{ fontFamily: "var(--font-display)", color: "rgba(255,255,255,0.25)", fontSize: 14 }}>UbXec</span>
+          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.15)" }}>© 2026 · Premium Executive Search Platform · Москва</p>
           <div className="flex gap-5">
-            <Link href="/pricing" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Тарифы</Link>
-            <Link href="/auth/login" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Войти</Link>
-            <Link href="/auth/register" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Регистрация</Link>
-            <Link href="/agencies" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.3)" }}>Для агентств</Link>
+            {["Тарифы", "Войти", "Регистрация", "Для агентств"].map((l) => (
+              <Link key={l} href={l === "Тарифы" ? "/pricing" : l === "Войти" ? "/auth/login" : l === "Регистрация" ? "/auth/register" : "/agencies"}
+                style={{ fontSize: 11, color: "rgba(255,255,255,0.22)" }}>
+                {l}
+              </Link>
+            ))}
           </div>
         </div>
       </footer>

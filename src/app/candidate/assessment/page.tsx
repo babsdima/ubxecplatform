@@ -52,7 +52,7 @@ export default async function AssessmentPage() {
       <div className="dash-hero">
         <div className="max-w-4xl mx-auto px-5 pt-10 pb-2 relative z-10">
           <p className="text-xs font-bold tracking-widest uppercase mb-2"
-            style={{ color: "hsl(38 52% 55%)" }}>Кандидат</p>
+            style={{ color: "rgba(255,255,255,0.35)" }}>Кандидат</p>
           <h1
             className="text-3xl font-bold tracking-tight"
             style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}

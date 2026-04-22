@@ -86,7 +86,7 @@ export default async function CompanyDashboard() {
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
               <p className="text-xs font-bold tracking-widest uppercase mb-2"
-                style={{ color: "hsl(38 52% 55%)" }}>
+                style={{ color: "rgba(255,255,255,0.35)" }}>
                 {company.industry} · {company.size}
               </p>
               <h1
@@ -106,7 +106,7 @@ export default async function CompanyDashboard() {
                 <span className="badge-verified">Верифицирована</span>
               ) : (
                 <span className="text-xs font-semibold px-3 py-1.5 rounded-full"
-                  style={{ background: "rgba(217,119,6,0.15)", color: "hsl(38 72% 70%)", border: "1px solid rgba(217,119,6,0.3)" }}>
+                  style={{ background: "var(--warning-bg)", color: "var(--warning)", border: "1px solid var(--warning-border)" }}>
                   На проверке
                 </span>
               )}
@@ -129,7 +129,7 @@ export default async function CompanyDashboard() {
             <Link
               href="/company/mandates/new"
               className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-              style={{ background: "hsl(38 52% 55%)", color: "#fff" }}
+              style={{ background: "var(--accent)", color: "#fff" }}
             >
               <Plus className="w-3.5 h-3.5" />
               Новая позиция

@@ -47,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru" className={`h-full ${inter.variable} ${playfair.variable}`}>
+    <html lang="ru" data-theme="steel" className={`h-full ${inter.variable} ${playfair.variable}`}>
       <body className="min-h-full flex flex-col bg-background text-foreground antialiased font-sans">
         {children}
         <Toaster position="bottom-right" richColors />

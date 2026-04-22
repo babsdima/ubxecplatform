@@ -82,7 +82,7 @@ export default async function MandatesPage({
         <div className="max-w-5xl mx-auto px-5 pt-10 pb-2 relative z-10 flex items-end justify-between gap-4">
           <div>
             <p className="text-xs font-bold tracking-widest uppercase mb-2"
-              style={{ color: "hsl(38 52% 55%)" }}>Компания</p>
+              style={{ color: "rgba(255,255,255,0.35)" }}>Компания</p>
             <h1
               className="text-3xl font-bold tracking-tight"
               style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
@@ -90,7 +90,7 @@ export default async function MandatesPage({
               Позиции
             </h1>
             {totalAwaiting > 0 ? (
-              <p className="text-sm mt-1" style={{ color: "hsl(38 72% 65%)" }}>
+              <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.6)" }}>
                 🔥 {totalAwaiting} {totalAwaiting === 1 ? "кандидат ждёт" : "кандидата ждут"} ответа
               </p>
             ) : (
@@ -102,7 +102,7 @@ export default async function MandatesPage({
           <Link
             href="/company/mandates/new"
             className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-colors shrink-0"
-            style={{ background: "hsl(38 52% 55%)", color: "#fff" }}
+            style={{ background: "var(--accent)", color: "#fff" }}
           >
             <Plus className="w-3.5 h-3.5" />
             Новая позиция

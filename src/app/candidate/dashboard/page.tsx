@@ -103,7 +103,7 @@ export default async function CandidateDashboard() {
           {profile.status === "PENDING" && (
             <div className="mb-5 rounded-xl border px-4 py-3"
               style={{ background: "rgba(217,119,6,0.12)", borderColor: "rgba(217,119,6,0.3)" }}>
-              <p className="text-sm font-medium" style={{ color: "hsl(38 72% 72%)" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--warning-light)" }}>
                 Профиль на проверке — команда UbXec верифицирует его в течение 24 часов.
               </p>
             </div>
@@ -122,7 +122,7 @@ export default async function CandidateDashboard() {
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold tracking-widest uppercase mb-2"
-                  style={{ color: "hsl(38 52% 55%)" }}>
+                  style={{ color: "rgba(255,255,255,0.35)" }}>
                   {profile.industry} · {profile.yearsExperience} лет опыта
                 </p>
                 <h1
@@ -195,12 +195,12 @@ export default async function CandidateDashboard() {
           <div className="pc p-6 space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-slate-800">Заполненность профиля</p>
-              <span className="text-sm font-bold" style={{ color: "hsl(38 52% 48%)" }}>{pct}%</span>
+              <span className="text-sm font-bold" style={{ color: "var(--accent)" }}>{pct}%</span>
             </div>
             <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${pct}%`, background: "linear-gradient(90deg, hsl(38 52% 48%), hsl(38 72% 62%))" }}
+                style={{ width: `${pct}%`, background: "hsl(var(--ink-600))" }}
               />
             </div>
             <div className="grid grid-cols-2 gap-y-2 gap-x-4">
