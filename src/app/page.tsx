@@ -205,64 +205,76 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* ── ДЛЯ ТОП-МЕНЕДЖЕРОВ ───────────────────────────────────────── */}
+        {/* ── ДЛЯ ТОП-МЕНЕДЖЕРОВ И КОМПАНИЙ ───────────────────────────── */}
         <section className="py-28 px-7" style={{ background: "hsl(var(--neutral-50))" }}>
           <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-16 items-start">
-              <div>
-                <p className="text-[10px] font-bold tracking-[0.12em] uppercase mb-4" style={{ color: "#94a3b8" }}>Для топ-менеджеров</p>
-                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", color: "hsl(var(--ink-800))", marginBottom: 20 }}>
-                  Новые возможности,<br />развитие и сильное<br />окружение
-                </h2>
-                <p style={{ fontSize: 15, color: "hsl(var(--neutral-500))", lineHeight: 1.8, marginBottom: 32 }}>
-                  Платформа помогает не только находить новые роли, но и усиливать профессиональный капитал.
-                </p>
-                <div className="space-y-3 mb-8">
-                  {[
-                    { icon: <Briefcase size={14} />,   text: "Доступ к новым карьерным возможностям" },
-                    { icon: <EyeOff size={14} />,      text: "Confidential search при необходимости" },
-                    { icon: <Brain size={14} />,       text: "Assessment и AI-интерпретация профиля" },
-                    { icon: <Handshake size={14} />,   text: "Mentoring, consulting и Advisory Board" },
-                    { icon: <Users size={14} />,       text: "Сильное leadership-комьюнити" },
-                    { icon: <CalendarDays size={14} />,text: "Мероприятия, нетворк и профессиональная среда" },
-                  ].map(({ icon, text }) => (
-                    <div key={text} className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "hsl(var(--neutral-100))", color: "#64748b" }}>{icon}</div>
-                      <span style={{ fontSize: 14, color: "hsl(var(--neutral-600))" }}>{text}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  <Link href="/auth/register?role=CANDIDATE" className="inline-flex items-center gap-2 rounded-xl text-sm font-bold" style={{ padding: "12px 22px", background: "var(--accent)", color: "#fff" }}>
-                    Создать профиль <ArrowRight size={14} />
-                  </Link>
-                  <Link href="/auth/register?role=CANDIDATE" className="inline-flex items-center gap-2 rounded-xl text-sm font-medium border" style={{ padding: "12px 18px", borderColor: "hsl(var(--neutral-200))", color: "hsl(var(--neutral-600))" }}>
-                    Пройти assessment
-                  </Link>
+            <div className="grid md:grid-cols-2 gap-6 items-start">
+
+              {/* Топ-менеджеры — тёмная карточка */}
+              <div className="relative overflow-hidden rounded-3xl p-10" style={{ background: "hsl(var(--ink-800))" }}>
+                {/* Ambient glow corner */}
+                <div className="absolute top-0 right-0 w-64 h-64 pointer-events-none" style={{ background: "radial-gradient(circle, var(--accent-glow-strong), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.10em] uppercase" style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.10)" }}>
+                    <UserCircle size={12} color="rgba(255,255,255,0.45)" />Для топ-менеджеров
+                  </div>
+                  <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.75rem, 3vw, 2.5rem)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", color: "hsl(var(--warm-white))", marginBottom: 12 }}>
+                    Новые возможности,<br />развитие и сильное<br />окружение
+                  </h2>
+                  <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", lineHeight: 1.75, marginBottom: 28 }}>
+                    Платформа помогает не только находить новые роли, но и усиливать профессиональный капитал.
+                  </p>
+                  <div className="space-y-2.5 mb-8">
+                    {[
+                      { icon: <Briefcase size={13} />,   text: "Доступ к новым карьерным возможностям" },
+                      { icon: <EyeOff size={13} />,      text: "Confidential search при необходимости" },
+                      { icon: <Brain size={13} />,       text: "Assessment и AI-интерпретация профиля" },
+                      { icon: <Handshake size={13} />,   text: "Mentoring, consulting и Advisory Board" },
+                      { icon: <Users size={13} />,       text: "Сильное leadership-комьюнити" },
+                      { icon: <CalendarDays size={13} />,text: "Мероприятия, нетворк и профессиональная среда" },
+                    ].map(({ icon, text }) => (
+                      <div key={text} className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.45)" }}>{icon}</div>
+                        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>{text}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <Link href="/auth/register?role=CANDIDATE" className="inline-flex items-center gap-2 rounded-xl text-sm font-bold" style={{ padding: "12px 22px", background: "var(--accent)", color: "#fff" }}>
+                      Создать профиль <ArrowRight size={14} />
+                    </Link>
+                    <Link href="/auth/register?role=CANDIDATE" className="inline-flex items-center gap-2 rounded-xl text-sm font-medium" style={{ padding: "12px 18px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.55)", border: "1px solid rgba(255,255,255,0.10)" }}>
+                      Пройти assessment
+                    </Link>
+                  </div>
                 </div>
               </div>
 
-              {/* ── ДЛЯ КОМПАНИЙ ────────────────────────────────────────── */}
-              <div>
-                <p className="text-[10px] font-bold tracking-[0.12em] uppercase mb-4" style={{ color: "#94a3b8" }}>Для компаний</p>
-                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", color: "hsl(var(--ink-800))", marginBottom: 20 }}>
+              {/* Компании — светлая карточка с бордером */}
+              <div className="relative overflow-hidden rounded-3xl p-10 border" style={{ background: "#fff", borderColor: "hsl(var(--neutral-200))" }}>
+                {/* Accent top bar */}
+                <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-light))" }} />
+                <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.10em] uppercase" style={{ background: "hsl(var(--neutral-100))", color: "#64748b" }}>
+                  <Building2 size={12} color="#64748b" />Для компаний
+                </div>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.75rem, 3vw, 2.5rem)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", color: "hsl(var(--ink-800))", marginBottom: 12 }}>
                   Доступ к сильным<br />executive-лидерам<br />в любом формате
                 </h2>
-                <p style={{ fontSize: 15, color: "hsl(var(--neutral-500))", lineHeight: 1.8, marginBottom: 32 }}>
+                <p style={{ fontSize: 14, color: "hsl(var(--neutral-500))", lineHeight: 1.75, marginBottom: 28 }}>
                   Находите и привлекайте топ-менеджеров для найма, mentoring, consulting и Advisory Board.
                 </p>
-                <div className="space-y-3 mb-8">
+                <div className="space-y-2.5 mb-8">
                   {[
-                    { icon: <Users size={14} />,      text: "Доступ к качественному пулу executive-талантов" },
-                    { icon: <EyeOff size={14} />,     text: "Confidential search" },
-                    { icon: <Brain size={14} />,      text: "Assessment-driven matching" },
-                    { icon: <Handshake size={14} />,  text: "Подбор менторов, консультантов и Advisory Board" },
-                    { icon: <DollarSign size={14} />, text: "Salary benchmarking" },
-                    { icon: <Target size={14} />,     text: "CEO-candidate compatibility analysis" },
+                    { icon: <Users size={13} />,      text: "Доступ к качественному пулу executive-талантов" },
+                    { icon: <EyeOff size={13} />,     text: "Confidential search" },
+                    { icon: <Brain size={13} />,      text: "Assessment-driven matching" },
+                    { icon: <Handshake size={13} />,  text: "Подбор менторов, консультантов и Advisory Board" },
+                    { icon: <DollarSign size={13} />, text: "Salary benchmarking" },
+                    { icon: <Target size={13} />,     text: "CEO-candidate compatibility analysis" },
                   ].map(({ icon, text }) => (
                     <div key={text} className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "hsl(var(--neutral-100))", color: "#64748b" }}>{icon}</div>
-                      <span style={{ fontSize: 14, color: "hsl(var(--neutral-600))" }}>{text}</span>
+                      <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: "hsl(var(--neutral-100))", color: "#64748b" }}>{icon}</div>
+                      <span style={{ fontSize: 13, color: "hsl(var(--neutral-600))" }}>{text}</span>
                     </div>
                   ))}
                 </div>
