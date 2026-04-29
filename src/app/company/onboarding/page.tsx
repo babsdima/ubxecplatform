@@ -67,7 +67,7 @@ export default async function CompanyOnboarding() {
           ))}
         </div>
 
-        {/* Why use UbXec */}
+        {/* Why use GradeUp */}
         <div className="grid grid-cols-3 gap-3 mb-8">
           {[
             { icon: "🎯", title: "Только C-level", desc: "Верифицированные CFO, CTO, COO, CEO" },

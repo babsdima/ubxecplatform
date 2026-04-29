@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
-  title: "Тарифы для компаний — UbXec",
+  title: "Тарифы для компаний — GradeUp",
   description:
     "Фиксированная подписка без процентов от зарплаты. Выберите тариф под размер вашей задачи.",
 };
@@ -69,7 +69,7 @@ const plans = [
       "Белый лейбл (по запросу)",
     ],
     cta: "Обсудить условия",
-    href: "mailto:sales@ubxec.ru",
+    href: "mailto:sales@gradeup.ru",
     variant: "outline" as const,
   },
 ];
@@ -77,7 +77,7 @@ const plans = [
 const faq = [
   {
     q: "Есть ли процент от зарплаты или success fee?",
-    a: "Нет. UbXec работает только на фиксированной подписке — никаких скрытых платежей и комиссий при закрытии позиции.",
+    a: "Нет. GradeUp работает только на фиксированной подписке — никаких скрытых платежей и комиссий при закрытии позиции.",
   },
   {
     q: "Можно ли сменить тариф в процессе?",
@@ -89,7 +89,7 @@ const faq = [
   },
   {
     q: "Как проверяются кандидаты?",
-    a: "Каждый кандидат проходит верификацию администратором UbXec: проверка опыта, достижений и соответствия C-level уровню.",
+    a: "Каждый кандидат проходит верификацию администратором GradeUp: проверка опыта, достижений и соответствия C-level уровню.",
   },
 ];
 
@@ -99,7 +99,7 @@ export default function PricingPage() {
       {/* Nav */}
       <header className="bg-background border-b sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="font-bold text-lg">UbXec</Link>
+          <Link href="/" className="font-bold text-lg">GradeUp</Link>
           <div className="flex gap-4 items-center">
             <Link href="/auth/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Войти

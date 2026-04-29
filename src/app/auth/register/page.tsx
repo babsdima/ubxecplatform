@@ -40,7 +40,7 @@ function RegisterForm() {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <Link href="/" className="text-2xl font-bold text-primary mb-1 block">UbXec</Link>
+          <Link href="/" className="text-2xl font-bold mb-1 block" style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}>Grade<span style={{ color: "var(--accent)" }}>Up</span></Link>
           <CardTitle className="text-xl">Регистрация</CardTitle>
         </CardHeader>
         <CardContent>

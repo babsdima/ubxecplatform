@@ -34,7 +34,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="text-2xl font-bold text-primary mb-1">UbXec</div>
+          <div className="text-2xl font-bold mb-1" style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}>Grade<span style={{ color: "var(--accent)" }}>Up</span></div>
           <CardTitle className="text-xl">Войти в систему</CardTitle>
         </CardHeader>
         <CardContent>

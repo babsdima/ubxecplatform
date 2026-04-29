@@ -1,552 +1,432 @@
-import type { Metadata } from "next";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import {
-  UserCircle,
-  Sparkles,
-  Handshake,
-  EyeOff,
-  Zap,
-  Users,
-  ShieldCheck,
-  Clock,
-  BadgeCheck,
-  Building2,
-  ChevronRight,
-  Lock,
-  Brain,
-  BarChart3,
-  Award,
-  Target,
-  MessageSquare,
-  Briefcase,
-  Route,
-  ClipboardList,
-  FileText,
-  CalendarDays,
-  Layers,
-  TrendingUp,
-  Star,
-  Network,
-  Coffee,
-  Mic2,
-  DollarSign,
-  ArrowRight,
-} from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "UbXec — Платформа для топ-менеджеров и компаний",
-  description:
-    "Премиальная платформа: executive search нового поколения, confidential hiring, assessment, развитие и сильное leadership-комьюнити в одном месте.",
-  openGraph: {
-    title: "UbXec — Платформа для топ-менеджеров и компаний",
-    description:
-      "Executive search, confidential hiring, AI-powered matching, assessment и leadership-комьюнити для топ-менеджеров и компаний.",
-  },
-};
-
-export default async function Home() {
-  const session = await auth();
-
-  if (session) {
-    const role = session.user.role;
-    if (role === "CANDIDATE") redirect("/candidate/dashboard");
-    if (role === "COMPANY") redirect("/company/dashboard");
-    if (role === "ADMIN") redirect("/admin");
-  }
-
+export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col" style={{ fontFamily: "var(--font-sans)" }}>
-
-      {/* ── NAV ─────────────────────────────────────────────────────────── */}
-      <header
-        className="sticky top-0 z-50"
-        style={{ background: "hsl(var(--ink-800))", borderBottom: "1px solid rgba(255,255,255,0.07)" }}
-      >
-        <div className="max-w-6xl mx-auto px-7 h-16 flex items-center justify-between">
-          <span style={{ fontFamily: "var(--font-display)", fontSize: 21, fontWeight: 700, color: "hsl(var(--warm-white))", letterSpacing: "-0.01em" }}>
-            Ub<span style={{ color: "var(--accent)" }}>X</span>ec
+    <main className="min-h-screen bg-background text-foreground">
+      {/* Nav */}
+      <header className="fixed top-0 inset-x-0 z-50 border-b border-white/5 bg-background/80 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <span
+            className="font-bold text-xl tracking-tight"
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+          >
+            Grade<span style={{ color: "var(--accent)" }}>Up</span>
           </span>
-          <nav className="hidden md:flex gap-0.5 items-center">
-            <Link href="/community" className="text-sm px-3.5 py-2 rounded-lg transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Комьюнити</Link>
-            <Link href="/pricing"   className="text-sm px-3.5 py-2 rounded-lg transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Тарифы</Link>
-            <Link href="/auth/login" className="text-sm px-3.5 py-2 rounded-lg transition-colors" style={{ color: "rgba(255,255,255,0.45)" }}>Войти</Link>
+          <nav className="hidden md:flex items-center gap-6 text-sm text-slate-400">
+            <Link href="/community" className="hover:text-foreground transition-colors">Комьюнити</Link>
+            <Link href="/pricing" className="hover:text-foreground transition-colors">Тарифы</Link>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/auth/login"
+              className="text-sm text-slate-400 hover:text-foreground transition-colors"
+            >
+              Войти
+            </Link>
             <Link
               href="/auth/register"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-lg transition-all"
+              className="text-sm px-4 py-2 rounded-lg font-medium"
               style={{ background: "var(--accent)", color: "#fff" }}
             >
-              Начать <ChevronRight size={14} />
+              Начать
             </Link>
-          </nav>
+          </div>
         </div>
       </header>
 
-      <main className="flex-1">
-
-        {/* ── HERO ──────────────────────────────────────────────────────── */}
-        <section
-          className="relative overflow-hidden hero-grid"
-          style={{ background: "hsl(var(--ink-800))", minHeight: "calc(100vh - 64px)", display: "flex", alignItems: "center" }}
-        >
-          <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(ellipse 80% 50% at 50% -10%, var(--accent-glow), transparent)" }} />
-          <div className="absolute pointer-events-none" style={{ right: "-10%", top: "10%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, var(--accent-glow-strong) 0%, transparent 65%)" }} />
-
-          <div className="relative max-w-6xl mx-auto px-7 py-20 w-full">
-            <div style={{ maxWidth: 720 }}>
-
-              {/* Eyebrow */}
-              <div className="inline-flex items-center gap-2 mb-8 animate-fade-up" style={{ border: "1px solid rgba(255,255,255,0.10)", borderRadius: "100px", padding: "6px 16px 6px 10px", background: "rgba(255,255,255,0.04)" }}>
-                <span className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.08)" }}>
-                  <Sparkles size={11} color="rgba(255,255,255,0.5)" />
-                </span>
-                <span className="text-[10px] font-bold tracking-[0.10em] uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  Premium AI-powered Executive Platform
-                </span>
-              </div>
-
-              {/* Headline */}
-              <h1
-                className="animate-fade-up-delay-1"
-                style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.8rem, 6.5vw, 5rem)", fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.03em", color: "hsl(var(--warm-white))", marginBottom: "1.75rem" }}
-              >
-                Платформа для<br />топ-менеджеров<br />
-                <span style={{ color: "var(--accent)", fontStyle: "italic", display: "inline-block", paddingBottom: "0.35em" }}>и компаний</span>
-              </h1>
-
-              <p className="animate-fade-up-delay-2" style={{ fontSize: "1.0625rem", lineHeight: 1.78, color: "rgba(255,255,255,0.42)", maxWidth: 560, marginBottom: "2.25rem" }}>
-                Executive Search нового поколения, confidential hiring, карьерные возможности, assessment и сильное leadership-комьюнити — в одном месте.
-              </p>
-
-              <div className="flex flex-wrap gap-3 mb-8 animate-fade-up-delay-3">
-                <Link href="/auth/register?role=CANDIDATE" className="inline-flex items-center gap-2 rounded-xl text-sm font-bold transition-all" style={{ padding: "14px 26px", background: "var(--accent)", color: "#fff" }}>
-                  <UserCircle size={16} />Топ-менеджеру
-                </Link>
-                <Link href="/auth/register?role=COMPANY" className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold transition-all" style={{ padding: "14px 22px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.72)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                  <Building2 size={16} color="rgba(255,255,255,0.55)" />Компании
-                </Link>
-                <Link href="/community" className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold transition-all" style={{ padding: "14px 22px", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.55)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <Users size={16} color="rgba(255,255,255,0.4)" />Вступить в комьюнити
-                </Link>
-              </div>
-
-              <div className="flex items-center gap-5 flex-wrap">
-                {[
-                  { icon: <ShieldCheck size={13} />, label: "Бесплатно для кандидатов" },
-                  { icon: <EyeOff size={13} />,      label: "Confidential search" },
-                  { icon: <BadgeCheck size={13} />,  label: "Верификация профиля" },
-                ].map(({ icon, label }) => (
-                  <div key={label} className="flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.22)" }}>
-                    {icon}
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.28)" }}>{label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+      {/* Hero */}
+      <section className="pt-40 pb-24 px-6 text-center relative overflow-hidden">
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 50% -10%, var(--accent-glow-strong), transparent)",
+          }}
+        />
+        <div className="relative max-w-4xl mx-auto">
+          <p className="eyebrow mb-4">Экосистема для топ-менеджеров</p>
+          <h1
+            className="text-5xl md:text-7xl font-bold tracking-tight leading-none mb-6"
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+          >
+            Развитие.{" "}
+            <span style={{ color: "var(--accent)" }}>Доход.</span>
+            <br />
+            Возможности.
+          </h1>
+          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+            GradeUp — платформа развития и карьерных возможностей для топ-менеджеров.
+            Для компаний — быстрый доступ к управленческому таланту и экспертизе.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/auth/register?role=candidate"
+              className="px-8 py-3.5 rounded-xl font-semibold text-white transition-all hover:opacity-90"
+              style={{ background: "var(--accent)" }}
+            >
+              Я топ-менеджер
+            </Link>
+            <Link
+              href="/auth/register?role=company"
+              className="px-8 py-3.5 rounded-xl font-semibold transition-all"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                color: "hsl(40 33% 96%)",
+              }}
+            >
+              Я компания
+            </Link>
+            <Link
+              href="/community"
+              className="px-8 py-3.5 rounded-xl font-semibold transition-all text-slate-400 hover:text-foreground"
+            >
+              Комьюнити →
+            </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── STATS STRIP ───────────────────────────────────────────────── */}
-        <section style={{ background: "hsl(var(--ink-700))", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-          <div className="max-w-6xl mx-auto px-7 py-8">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-0">
-              {[
-                { icon: <Brain size={15} />,      v: "AI",       l: "powered matching" },
-                { icon: <EyeOff size={15} />,     v: "100%",     l: "confidential search" },
-                { icon: <BadgeCheck size={15} />, v: "Assessed", l: "verified candidates" },
-                { icon: <Users size={15} />,      v: "Community",l: "leadership network" },
-              ].map(({ icon, v, l }, i) => (
-                <div key={l} className="text-center px-4 py-1" style={{ borderRight: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none", color: "rgba(255,255,255,0.35)" }}>
-                  <div className="flex justify-center mb-2.5">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(255,255,255,0.05)" }}>{icon}</div>
-                  </div>
-                  <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", fontWeight: 700, color: "var(--accent)", lineHeight: 1, marginBottom: 5 }}>{v}</p>
-                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", letterSpacing: "0.04em" }}>{l}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── ПЛАТФОРМА — КРАТКОЕ ОПИСАНИЕ ──────────────────────────────── */}
-        <section className="py-24 px-7 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-16 items-center">
-              <div>
-                <p className="text-[10px] font-bold tracking-[0.12em] uppercase mb-4" style={{ color: "#94a3b8" }}>О платформе</p>
-                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", color: "hsl(var(--ink-800))", marginBottom: 24 }}>
-                  Больше, чем<br />executive search
-                </h2>
-                <p style={{ fontSize: 15, color: "hsl(var(--neutral-500))", lineHeight: 1.8, marginBottom: 20 }}>
-                  Мы создаём премиальную платформу для топ-менеджеров и компаний, где сочетаются executive search, развитие, нетворк и современные AI-инструменты для подбора и оценки лидеров.
-                </p>
-                <p style={{ fontSize: 15, color: "hsl(var(--neutral-500))", lineHeight: 1.8 }}>
-                  Для топ-менеджеров это пространство новых возможностей, роста и сильного профессионального окружения. Для компаний — современный канал поиска, оценки и привлечения executive-талантов.
-                </p>
+      {/* Stats strip */}
+      <section className="py-10 border-y border-white/5 bg-white/2">
+        <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          {[
+            { val: "24–48ч", label: "до shortlist для компаний" },
+            { val: "2–3×", label: "дешевле executive search" },
+            { val: "5 блоков", label: "развития в одном месте" },
+            { val: "C-level", label: "фокус платформы" },
+          ].map(({ val, label }) => (
+            <div key={label}>
+              <div className="text-3xl font-bold mb-1" style={{ color: "var(--accent)" }}>
+                {val}
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { icon: <Target size={20} color="#475569" />,    title: "Executive Search",    desc: "AI-powered matching с учётом assessment-профиля" },
-                  { icon: <EyeOff size={20} color="#475569" />,    title: "Confidential Hiring",  desc: "Анонимность до взаимного интереса обеих сторон" },
-                  { icon: <Brain size={20} color="#475569" />,     title: "Assessment",           desc: "DISC, MBTI, Hogan и AI flash-report" },
-                  { icon: <Users size={20} color="#475569" />,     title: "Комьюнити",            desc: "Закрытое leadership-сообщество топ-менеджеров" },
-                  { icon: <Handshake size={20} color="#475569" />, title: "Mentoring & Advisory", desc: "Ментор, консультант, Advisory Board" },
-                  { icon: <Layers size={20} color="#475569" />,    title: "Executive Services",   desc: "Salary benchmarking, CEO compatibility и другие" },
-                ].map(({ icon, title, desc }) => (
-                  <div key={title} className="rounded-xl p-4" style={{ background: "hsl(var(--neutral-50))", border: "1px solid hsl(var(--neutral-200))" }}>
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style={{ background: "hsl(var(--neutral-100))" }}>{icon}</div>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: "hsl(var(--ink-800))", marginBottom: 4 }}>{title}</p>
-                    <p style={{ fontSize: 11, color: "hsl(var(--neutral-500))", lineHeight: 1.5 }}>{desc}</p>
-                  </div>
-                ))}
-              </div>
+              <div className="text-sm text-slate-500">{label}</div>
             </div>
-          </div>
-        </section>
+          ))}
+        </div>
+      </section>
 
-        {/* ── ДЛЯ ТОП-МЕНЕДЖЕРОВ И КОМПАНИЙ ───────────────────────────── */}
-        <section className="py-28 px-7" style={{ background: "hsl(var(--neutral-50))" }}>
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-6 items-start">
+      {/* Platform tagline */}
+      <section className="py-20 px-6 text-center">
+        <div className="max-w-3xl mx-auto">
+          <p className="eyebrow mb-3">Больше, чем рекрутинг</p>
+          <h2
+            className="text-3xl md:text-4xl font-bold mb-5"
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+          >
+            От роста — к доходу — к сделкам
+          </h2>
+          <p className="text-slate-400 text-lg">
+            GradeUp — это не рекрутинговая платформа и не образовательная.
+            Это экосистема управления карьерой и экспертизой в одном месте.
+          </p>
+        </div>
+      </section>
 
-              {/* Топ-менеджеры — тёмная карточка */}
-              <div className="relative overflow-hidden rounded-3xl p-10" style={{ background: "hsl(var(--ink-800))" }}>
-                {/* Ambient glow corner */}
-                <div className="absolute top-0 right-0 w-64 h-64 pointer-events-none" style={{ background: "radial-gradient(circle, var(--accent-glow-strong), transparent 70%)" }} />
-                <div className="relative">
-                  <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.10em] uppercase" style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.10)" }}>
-                    <UserCircle size={12} color="rgba(255,255,255,0.45)" />Для топ-менеджеров
-                  </div>
-                  <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.75rem, 3vw, 2.5rem)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", color: "hsl(var(--warm-white))", marginBottom: 12 }}>
-                    Новые возможности,<br />развитие и сильное<br />окружение
-                  </h2>
-                  <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", lineHeight: 1.75, marginBottom: 28 }}>
-                    Платформа помогает не только находить новые роли, но и усиливать профессиональный капитал.
-                  </p>
-                  <div className="space-y-2.5 mb-8">
-                    {[
-                      { icon: <Briefcase size={13} />,   text: "Доступ к новым карьерным возможностям" },
-                      { icon: <EyeOff size={13} />,      text: "Confidential search при необходимости" },
-                      { icon: <Brain size={13} />,       text: "Assessment и AI-интерпретация профиля" },
-                      { icon: <Handshake size={13} />,   text: "Mentoring, consulting и Advisory Board" },
-                      { icon: <Users size={13} />,       text: "Сильное leadership-комьюнити" },
-                      { icon: <CalendarDays size={13} />,text: "Мероприятия, нетворк и профессиональная среда" },
-                    ].map(({ icon, text }) => (
-                      <div key={text} className="flex items-center gap-3">
-                        <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.45)" }}>{icon}</div>
-                        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>{text}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    <Link href="/auth/register?role=CANDIDATE" className="inline-flex items-center gap-2 rounded-xl text-sm font-bold" style={{ padding: "12px 22px", background: "var(--accent)", color: "#fff" }}>
-                      Создать профиль <ArrowRight size={14} />
-                    </Link>
-                    <Link href="/auth/register?role=CANDIDATE" className="inline-flex items-center gap-2 rounded-xl text-sm font-medium" style={{ padding: "12px 18px", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.55)", border: "1px solid rgba(255,255,255,0.10)" }}>
-                      Пройти assessment
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              {/* Компании — светлая карточка с бордером */}
-              <div className="relative overflow-hidden rounded-3xl p-10 border" style={{ background: "#fff", borderColor: "hsl(var(--neutral-200))" }}>
-                {/* Accent top bar */}
-                <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-light))" }} />
-                <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-[0.10em] uppercase" style={{ background: "hsl(var(--neutral-100))", color: "#64748b" }}>
-                  <Building2 size={12} color="#64748b" />Для компаний
-                </div>
-                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.75rem, 3vw, 2.5rem)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", color: "hsl(var(--ink-800))", marginBottom: 12 }}>
-                  Доступ к сильным<br />executive-лидерам<br />в любом формате
-                </h2>
-                <p style={{ fontSize: 14, color: "hsl(var(--neutral-500))", lineHeight: 1.75, marginBottom: 28 }}>
-                  Находите и привлекайте топ-менеджеров для найма, mentoring, consulting и Advisory Board.
-                </p>
-                <div className="space-y-2.5 mb-8">
-                  {[
-                    { icon: <Users size={13} />,      text: "Доступ к качественному пулу executive-талантов" },
-                    { icon: <EyeOff size={13} />,     text: "Confidential search" },
-                    { icon: <Brain size={13} />,      text: "Assessment-driven matching" },
-                    { icon: <Handshake size={13} />,  text: "Подбор менторов, консультантов и Advisory Board" },
-                    { icon: <DollarSign size={13} />, text: "Salary benchmarking" },
-                    { icon: <Target size={13} />,     text: "CEO-candidate compatibility analysis" },
-                  ].map(({ icon, text }) => (
-                    <div key={text} className="flex items-center gap-3">
-                      <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: "hsl(var(--neutral-100))", color: "#64748b" }}>{icon}</div>
-                      <span style={{ fontSize: 13, color: "hsl(var(--neutral-600))" }}>{text}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  <Link href="/auth/register?role=COMPANY" className="inline-flex items-center gap-2 rounded-xl text-sm font-bold border" style={{ padding: "12px 22px", borderColor: "hsl(var(--ink-800))", color: "hsl(var(--ink-800))" }}>
-                    Разместить запрос <ArrowRight size={14} />
-                  </Link>
-                  <Link href="/pricing" className="inline-flex items-center gap-2 rounded-xl text-sm font-medium border" style={{ padding: "12px 18px", borderColor: "hsl(var(--neutral-200))", color: "hsl(var(--neutral-600))" }}>
-                    Узнать про услуги
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── КОМЬЮНИТИ ─────────────────────────────────────────────────── */}
-        <section className="py-28 px-7 relative overflow-hidden" style={{ background: "hsl(var(--ink-800))" }}>
-          <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(ellipse 80% 60% at 50% -20%, var(--accent-glow), transparent)" }} />
-          <div className="max-w-6xl mx-auto relative">
-            <div className="max-w-3xl mx-auto text-center mb-16">
-              <p className="text-[10px] font-bold tracking-[0.12em] uppercase mb-4" style={{ color: "rgba(255,255,255,0.3)" }}>Leadership-комьюнити</p>
-              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", color: "hsl(var(--warm-white))", marginBottom: 20 }}>
-                Закрытая среда для<br />
-                <span style={{ color: "var(--accent)", fontStyle: "italic", display: "inline-block", paddingBottom: "0.35em" }}>сильных лидеров</span>
-              </h2>
-              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", lineHeight: 1.8 }}>
-                Профессиональные встречи, митапы, конференции, private events и сильный нетворк. Комьюнити помогает находить идеи, связи, партнёрства и новые карьерные возможности.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-12">
-              {[
-                { icon: <Mic2 size={18} />,        label: "Конференции",         desc: "Тематические leadership-конференции" },
-                { icon: <CalendarDays size={18} />, label: "Митапы",              desc: "Регулярные встречи сообщества" },
-                { icon: <Star size={18} />,         label: "Закрытые ужины",      desc: "Private events в малых группах" },
-                { icon: <Network size={18} />,      label: "Peer-to-peer нетворк",desc: "Прямые связи между лидерами" },
-                { icon: <Coffee size={18} />,       label: "Неформальные форматы",desc: "Padel, games, клубные встречи" },
-                { icon: <TrendingUp size={18} />,   label: "Leadership Talks",    desc: "Дискуссии об опыте и практиках" },
-              ].map(({ icon, label, desc }) => (
-                <div key={label} className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <div className="w-9 h-9 rounded-[10px] flex items-center justify-center mb-3" style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.5)" }}>{icon}</div>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: "hsl(40 33% 92%)", marginBottom: 4 }}>{label}</p>
-                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", lineHeight: 1.5 }}>{desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-center">
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", marginBottom: 20 }}>
-                Для компаний комьюнити — это способ быть ближе к сильной executive-аудитории и усиливать employer brand.
-              </p>
-              <div className="flex flex-wrap gap-3 justify-center">
-                <Link href="/community" className="inline-flex items-center gap-2 rounded-xl text-sm font-bold" style={{ padding: "12px 22px", background: "var(--accent)", color: "#fff" }}>
-                  <Users size={15} />Вступить в комьюнити
-                </Link>
-                <Link href="/community" className="inline-flex items-center gap-2 rounded-xl text-sm font-medium" style={{ padding: "12px 20px", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.10)" }}>
-                  Ближайшие события
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── ASSESSMENT ────────────────────────────────────────────────── */}
-        <section className="py-28 px-7 bg-white">
-          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] uppercase mb-4" style={{ color: "#94a3b8" }}>
-                <ClipboardList size={11} color="#94a3b8" />Assessment и развитие
-              </p>
-              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, lineHeight: 1.22, letterSpacing: "-0.025em", color: "hsl(var(--ink-800))", marginBottom: 20 }}>
-                Не просто профиль —<br />
-                <span style={{ color: "var(--accent)", fontStyle: "italic", display: "inline-block", paddingBottom: "0.35em" }}>оценённый руководитель</span>
-              </h2>
-              <p style={{ fontSize: 15, color: "hsl(var(--neutral-500))", lineHeight: 1.8, marginBottom: 28 }}>
-                Каждый топ-менеджер может получить глубокое понимание своего профессионального профиля. Платформа соединяет карьерные возможности с assessment-подходом — от AI-интерпретации до development plan.
-              </p>
-              <div className="space-y-3 mb-8">
-                {[
-                  { icon: <Brain size={14} />,    text: "DISC, MBTI, Hogan — стандарты мировой практики" },
-                  { icon: <FileText size={14} />, text: "AI flash-report с интерпретацией профиля" },
-                  { icon: <Target size={14} />,   text: "Совместимость кандидата и CEO по Hogan" },
-                  { icon: <BarChart3 size={14} />,text: "Фильтрация по management style" },
-                ].map(({ icon, text }) => (
-                  <div key={text} className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "hsl(var(--neutral-100))", color: "#64748b" }}>{icon}</div>
-                    <span style={{ fontSize: 14, color: "hsl(var(--neutral-600))" }}>{text}</span>
-                  </div>
-                ))}
-              </div>
-              <p style={{ fontSize: 13, color: "hsl(var(--neutral-400))", lineHeight: 1.7 }}>
-                Assessment помогает компаниям смотреть на кандидатов глубже, чем через CV и опыт — особенно важно для C-level hiring, mentoring и Advisory Board.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: <Zap size={20} color="#475569" />,           label: "Flash-report",        desc: "AI-интерпретация за 24 часа" },
-                { icon: <Target size={20} color="#475569" />,        label: "Hogan Compatibility",  desc: "Совместимость с CEO компании" },
-                { icon: <Brain size={20} color="#475569" />,         label: "Management Style",     desc: "Стиль лидерства и решений" },
-                { icon: <MessageSquare size={20} color="#475569" />, label: "Deep-dive Session",    desc: "Разбор с ассессором" },
-                { icon: <TrendingUp size={20} color="#475569" />,    label: "Development Plan",     desc: "Персональный план развития" },
-                { icon: <Award size={20} color="#475569" />,         label: "Positioning Support",  desc: "Карьерное позиционирование" },
-              ].map(({ icon, label, desc }) => (
-                <div key={label} className="rounded-xl p-4" style={{ background: "hsl(var(--neutral-50))", border: "1px solid hsl(var(--neutral-200))" }}>
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style={{ background: "hsl(var(--neutral-100))" }}>{icon}</div>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: "hsl(var(--ink-800))", marginBottom: 4 }}>{label}</p>
-                  <p style={{ fontSize: 11, color: "hsl(var(--neutral-500))", lineHeight: 1.5 }}>{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── КАК ЭТО РАБОТАЕТ ──────────────────────────────────────────── */}
-        <section className="py-28 px-7" style={{ background: "hsl(var(--neutral-50))" }}>
-          <div className="max-w-6xl mx-auto">
-            <div style={{ maxWidth: 580, marginBottom: 56 }}>
-              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] uppercase mb-4" style={{ color: "#94a3b8" }}>
-                <Route size={11} color="#94a3b8" />Как это работает
-              </p>
-              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", color: "hsl(var(--ink-800))" }}>
-                От регистрации до нового шага — пять простых этапов
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-px" style={{ background: "hsl(var(--neutral-200))" }}>
-              {[
-                { n: "01", icon: <UserCircle size={22} color="#475569" />,   title: "Создайте профиль",               body: "Опишите опыт без раскрытия имени. Каждый профиль верифицируется командой UbXec." },
-                { n: "02", icon: <Briefcase size={22} color="#475569" />,    title: "Укажите форматы",                body: "Full-time, mentoring, consulting или Advisory Board — выберите то, что подходит вам." },
-                { n: "03", icon: <Brain size={22} color="#475569" />,        title: "Пройдите assessment",            body: "Усильте профиль профессиональной оценкой и получите AI flash-report." },
-                { n: "04", icon: <Sparkles size={22} color="#475569" />,     title: "Получайте мэтчи",               body: "AI-алгоритм находит релевантные возможности. Просматривайте предложения анонимно." },
-                { n: "05", icon: <Handshake size={22} color="#475569" />,    title: "Раскройте контакты",            body: "После взаимного интереса — прямой диалог без посредников и комиссий." },
-              ].map(({ n, icon, title, body }) => (
-                <div key={n} className="bg-white p-7 flex flex-col">
-                  <div className="flex items-start justify-between mb-5">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "hsl(var(--neutral-100))" }}>{icon}</div>
-                    <span style={{ fontFamily: "var(--font-display)", fontSize: "2.5rem", fontWeight: 700, color: "hsl(var(--neutral-200))", lineHeight: 1 }}>{n}</span>
-                  </div>
-                  <h3 style={{ fontSize: 14, fontWeight: 700, color: "hsl(var(--ink-800))", marginBottom: 8, lineHeight: 1.3 }}>{title}</h3>
-                  <p style={{ fontSize: 12, color: "hsl(var(--neutral-500))", lineHeight: 1.7 }}>{body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── ДОПОЛНИТЕЛЬНЫЕ УСЛУГИ ─────────────────────────────────────── */}
-        <section className="py-28 px-7 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <div style={{ maxWidth: 560, marginBottom: 56 }}>
-              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.12em] uppercase mb-4" style={{ color: "#94a3b8" }}>
-                <Award size={11} color="#94a3b8" />Дополнительные услуги
-              </p>
-              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", color: "hsl(var(--ink-800))" }}>
-                Полный набор executive-сервисов
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                {
-                  title: "Для топ-менеджеров",
-                  accent: false,
-                  items: [
-                    "Базовый assessment",
-                    "AI-интерпретация профиля",
-                    "Deep-dive assessment с экспертом",
-                    "Development plan",
-                    "Career positioning support",
-                    "Доступ к mentoring, consulting и board opportunities",
-                  ],
-                },
-                {
-                  title: "Для компаний",
-                  accent: true,
-                  items: [
-                    "Executive search",
-                    "Confidential search",
-                    "Salary benchmarking",
-                    "Executive assessment",
-                    "CEO-candidate compatibility analysis",
-                    "Advisory Board formation",
-                    "Company positioning",
-                    "Подбор менторов и консультантов",
-                  ],
-                },
-                {
-                  title: "Комьюнити",
-                  accent: false,
-                  items: [
-                    "Доступ ко всем мероприятиям",
-                    "Peer networking",
-                    "Leadership talks и дискуссии",
-                    "Закрытые встречи и ужины",
-                    "Для компаний — employer brand",
-                    "Партнёрство и sponsorship",
-                  ],
-                },
-              ].map(({ title, accent, items }) => (
-                <div key={title} className="rounded-[18px] p-8 border" style={{ borderColor: accent ? "var(--accent)" : "hsl(var(--neutral-200))", background: accent ? "hsl(var(--accent-dim))" : "#fff" }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "hsl(var(--ink-800))", marginBottom: 20 }}>{title}</h3>
-                  <ul className="space-y-2.5">
-                    {items.map((item) => (
-                      <li key={item} className="flex items-start gap-2.5">
-                        <BadgeCheck size={14} style={{ color: accent ? "var(--accent)" : "#94a3b8", marginTop: 1, flexShrink: 0 }} />
-                        <span style={{ fontSize: 13, color: "hsl(var(--neutral-600))", lineHeight: 1.5 }}>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── QUOTE ─────────────────────────────────────────────────────── */}
-        <section className="py-20 px-7 text-center" style={{ background: "hsl(var(--neutral-50))" }}>
-          <div className="max-w-3xl mx-auto">
-            <p style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.4rem, 3vw, 2rem)", fontWeight: 600, lineHeight: 1.45, color: "hsl(var(--ink-800))", letterSpacing: "-0.02em" }}>
-              «Лучшие карьерные решения рождаются не только через вакансии,<br className="hidden sm:block" />
-              но и через доверие, нетворк и качественную профессиональную среду»
-            </p>
-            <div className="w-10 h-0.5 mx-auto mt-7 rounded-full" style={{ background: "hsl(var(--neutral-200))" }} />
-          </div>
-        </section>
-
-        {/* ── CTA ───────────────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden py-28 px-7 text-center" style={{ background: "hsl(var(--ink-800))" }}>
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 80% at 50% 120%, var(--accent-glow), transparent)" }} />
-          <div className="relative max-w-[640px] mx-auto">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-[18px] mb-7" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}>
-              <Handshake size={26} color="rgba(255,255,255,0.5)" />
-            </div>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 700, lineHeight: 1.12, letterSpacing: "-0.025em", color: "hsl(var(--warm-white))", marginBottom: 16 }}>
-              Присоединяйтесь к новому<br />поколению executive search
+      {/* For managers — 4 pillars */}
+      <section className="py-10 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div
+            className="rounded-3xl p-10 md:p-14"
+            style={{ background: "hsl(222 47% 8%)", border: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <p className="eyebrow mb-2">Для топ-менеджеров</p>
+            <h2
+              className="text-3xl md:text-4xl font-bold mb-10"
+              style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+            >
+              Карьерный рост и новые источники дохода
             </h2>
-            <p style={{ fontSize: 15, color: "rgba(255,255,255,0.38)", marginBottom: 36, lineHeight: 1.78 }}>
-              Создайте профиль, присоединяйтесь к leadership-комьюнити и получайте доступ к новым возможностям, сильным людям и современным инструментам развития.
-            </p>
-            <div className="flex gap-3 justify-center flex-wrap">
-              <Link href="/auth/register?role=CANDIDATE" className="inline-flex items-center gap-2 rounded-xl text-sm font-bold" style={{ padding: "14px 26px", background: "var(--accent)", color: "#fff" }}>
-                <UserCircle size={16} />Создать профиль
-              </Link>
-              <Link href="/auth/register?role=COMPANY" className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold" style={{ padding: "14px 22px", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.65)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                <Building2 size={16} color="rgba(255,255,255,0.5)" />Разместить запрос
-              </Link>
-              <Link href="/community" className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold" style={{ padding: "14px 22px", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <Users size={16} color="rgba(255,255,255,0.4)" />Узнать про комьюнити
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  num: "01",
+                  title: "Оценка и позиционирование",
+                  desc: "Assessment, бенчмарки рынка, понимание своей стоимости и карьерной траектории",
+                },
+                {
+                  num: "02",
+                  title: "Развитие и рост",
+                  desc: "Индивидуальные планы развития, коучинг, подготовка к переходу на C-level и выше",
+                },
+                {
+                  num: "03",
+                  title: "Монетизация экспертизы",
+                  desc: "Консультации, advisory, менторство, проектная работа — новые источники дохода",
+                },
+                {
+                  num: "04",
+                  title: "Карьерные возможности",
+                  desc: "Вакансии уровня топ-менеджмента приходят к вам — match-модель без лишнего шума",
+                },
+              ].map(({ num, title, desc }) => (
+                <div
+                  key={num}
+                  className="rounded-2xl p-6"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+                >
+                  <div
+                    className="text-xs font-mono mb-4"
+                    style={{ color: "var(--accent)", opacity: 0.8 }}
+                  >
+                    {num}
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">{title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8">
+              <Link
+                href="/auth/register?role=candidate"
+                className="inline-block px-7 py-3 rounded-xl font-semibold text-white"
+                style={{ background: "var(--accent)" }}
+              >
+                Создать профиль
               </Link>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
 
-      {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-      <footer style={{ background: "hsl(var(--ink-900))", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-        <div className="max-w-6xl mx-auto px-7 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
-          <span style={{ fontFamily: "var(--font-display)", color: "rgba(255,255,255,0.25)", fontSize: 14 }}>UbXec</span>
-          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.15)" }}>© 2026 · Premium Executive Platform · Москва</p>
-          <div className="flex gap-5 flex-wrap justify-center">
+      {/* For companies */}
+      <section className="py-10 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div
+            className="rounded-3xl p-10 md:p-14"
+            style={{
+              background: "#fff",
+              border: "1px solid rgba(0,0,0,0.06)",
+              color: "hsl(222 47% 11%)",
+            }}
+          >
+            <div
+              className="h-1 w-16 rounded mb-6"
+              style={{ background: "var(--accent)" }}
+            />
+            <p className="text-sm font-medium tracking-wider uppercase mb-2" style={{ color: "var(--accent)" }}>
+              Для компаний
+            </p>
+            <h2
+              className="text-3xl md:text-4xl font-bold mb-3"
+              style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+            >
+              Быстрый доступ к управленческому таланту
+            </h2>
+            <p className="text-slate-500 mb-10 text-lg">
+              В 2–3 раза дешевле и быстрее, чем классический executive search
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  title: "Скорость",
+                  desc: "Long list за 24–48 часов. Прямой контакт с кандидатами без посредников.",
+                },
+                {
+                  title: "Стоимость",
+                  desc: "В 2–3 раза дешевле traditional executive search. Гибкие модели оплаты.",
+                },
+                {
+                  title: "Качество",
+                  desc: "Кандидаты уже вовлечены в развитие. Возможность проверки через консультацию до оффера.",
+                },
+                {
+                  title: "Экспертиза без найма",
+                  desc: "Менторы и консультанты для быстрого закрытия задач — альтернатива консалтингу.",
+                },
+              ].map(({ title, desc }) => (
+                <div
+                  key={title}
+                  className="rounded-2xl p-6"
+                  style={{ background: "#f8f9fb", border: "1px solid rgba(0,0,0,0.06)" }}
+                >
+                  <h3 className="font-semibold mb-2" style={{ color: "hsl(222 47% 11%)" }}>
+                    {title}
+                  </h3>
+                  <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8">
+              <Link
+                href="/auth/register?role=company"
+                className="inline-block px-7 py-3 rounded-xl font-semibold text-white"
+                style={{ background: "var(--accent)" }}
+              >
+                Найти топ-менеджера
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Platform architecture */}
+      <section className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="eyebrow mb-3">Архитектура платформы</p>
+            <h2
+              className="text-3xl md:text-4xl font-bold"
+              style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+            >
+              Как устроена экосистема
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
             {[
-              { label: "Комьюнити",   href: "/community" },
-              { label: "Тарифы",      href: "/pricing" },
-              { label: "Войти",       href: "/auth/login" },
-              { label: "Регистрация", href: "/auth/register" },
-              { label: "Для агентств",href: "/agencies" },
-            ].map(({ label, href }) => (
-              <Link key={label} href={href} style={{ fontSize: 11, color: "rgba(255,255,255,0.22)" }}>{label}</Link>
+              {
+                layer: "Core",
+                title: "Вход и развитие",
+                items: ["Assessment и оценка", "Индивидуальные планы (IDP)", "Коучинг", "Комьюнити"],
+              },
+              {
+                layer: "Growth",
+                title: "Активация и монетизация",
+                items: ["Менторство", "Консультации и advisory", "Peer-to-peer взаимодействие", "Нетворкинг"],
+              },
+              {
+                layer: "Monetization",
+                title: "Сделки и найм",
+                items: ["Доступ к вакансиям C-level", "Проекты с компаниями", "Найм через платформу", "Безопасные расчёты"],
+              },
+            ].map(({ layer, title, items }) => (
+              <div
+                key={layer}
+                className="rounded-2xl p-7"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                }}
+              >
+                <div
+                  className="text-xs font-mono uppercase tracking-widest mb-3"
+                  style={{ color: "var(--accent)" }}
+                >
+                  {layer}
+                </div>
+                <h3 className="font-semibold text-lg mb-4">{title}</h3>
+                <ul className="space-y-2">
+                  {items.map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-slate-400">
+                      <span className="mt-1.5 w-1 h-1 rounded-full shrink-0" style={{ background: "var(--accent)" }} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Community block */}
+      <section className="py-10 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div
+            className="rounded-3xl p-10 md:p-14 text-center"
+            style={{
+              background: "linear-gradient(135deg, hsl(222 47% 9%) 0%, hsl(215 60% 12%) 100%)",
+              border: "1px solid rgba(255,255,255,0.07)",
+            }}
+          >
+            <p className="eyebrow mb-3">Комьюнити</p>
+            <h2
+              className="text-3xl md:text-4xl font-bold mb-4"
+              style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+            >
+              Доступ к сильному окружению
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto mb-8 text-lg">
+              Закрытые воркшопы, CEO/CFO/CPO встречи, конференции и неформальный нетворкинг.
+              Развитие через практику и опыт других.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              {["CEO-встречи", "CFO-сессии", "CPO-разборы", "Воркшопы", "Конференции", "Нетворкинг"].map((tag) => (
+                <span
+                  key={tag}
+                  className="px-4 py-2 rounded-full text-sm font-medium"
+                  style={{ background: "rgba(255,255,255,0.06)", color: "hsl(40 33% 96%)" }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <Link
+              href="/community"
+              className="inline-block px-7 py-3 rounded-xl font-semibold text-white"
+              style={{ background: "var(--accent)" }}
+            >
+              Узнать о комьюнити
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Quote */}
+      <section className="py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <blockquote
+            className="text-2xl md:text-3xl font-medium leading-snug mb-6"
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+          >
+            «GradeUp — это не рекрутинг и не образование.
+            Это экосистема управления карьерой и экспертизой.»
+          </blockquote>
+          <p className="text-slate-500 text-sm">Для кандидатов — рост, доход и возможности. Для компаний — быстрый доступ к таланту и результату.</p>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-20 px-6 text-center border-t border-white/5">
+        <div className="max-w-2xl mx-auto">
+          <h2
+            className="text-3xl md:text-4xl font-bold mb-4"
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+          >
+            Готовы начать?
+          </h2>
+          <p className="text-slate-400 mb-8">
+            Присоединяйтесь к платформе — как топ-менеджер или как компания
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/auth/register?role=candidate"
+              className="px-8 py-4 rounded-xl font-semibold text-white"
+              style={{ background: "var(--accent)" }}
+            >
+              Я топ-менеджер
+            </Link>
+            <Link
+              href="/auth/register?role=company"
+              className="px-8 py-4 rounded-xl font-semibold"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                color: "hsl(40 33% 96%)",
+              }}
+            >
+              Я компания
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 py-8 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-600">
+          <span
+            className="font-bold"
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}
+          >
+            Grade<span style={{ color: "var(--accent)" }}>Up</span>
+          </span>
+          <div className="flex gap-6">
+            <Link href="/community" className="hover:text-slate-400 transition-colors">Комьюнити</Link>
+            <Link href="/pricing" className="hover:text-slate-400 transition-colors">Тарифы</Link>
+            <a href="mailto:hello@gradeup.ru" className="hover:text-slate-400 transition-colors">hello@gradeup.ru</a>
+          </div>
+        </div>
       </footer>
-    </div>
+    </main>
   );
 }

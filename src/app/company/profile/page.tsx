@@ -45,7 +45,7 @@ export default async function CompanyProfilePage() {
         {!company.isVerified && (
           <div className="mb-6 pc-amber p-4 pl-5">
             <p className="text-sm text-amber-800 font-medium">
-              <strong>Верификация в процессе.</strong> Команда UbXec проверит информацию о компании в течение 24 часов.
+              <strong>Верификация в процессе.</strong> Команда GradeUp проверит информацию о компании в течение 24 часов.
               Это не блокирует создание позиций и мэтчинг.
             </p>
           </div>

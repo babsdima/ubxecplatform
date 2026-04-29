@@ -104,7 +104,7 @@ export default async function CandidateDashboard() {
             <div className="mb-5 rounded-xl border px-4 py-3"
               style={{ background: "rgba(217,119,6,0.12)", borderColor: "rgba(217,119,6,0.3)" }}>
               <p className="text-sm font-medium" style={{ color: "var(--warning-light)" }}>
-                Профиль на проверке — команда UbXec верифицирует его в течение 24 часов.
+                Профиль на проверке — команда GradeUp верифицирует его в течение 24 часов.
               </p>
             </div>
           )}

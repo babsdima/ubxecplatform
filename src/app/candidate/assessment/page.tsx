@@ -121,7 +121,7 @@ export default async function AssessmentPage() {
                   {/* Pending notice */}
                   {isPending && (
                     <div className="mt-4 bg-amber-50 border border-amber-100 rounded-xl p-3.5 text-sm text-amber-700">
-                      Запрос получен. Команда UbXec свяжется с вами в течение 24 часов для организации тестирования.
+                      Запрос получен. Команда GradeUp свяжется с вами в течение 24 часов для организации тестирования.
                     </div>
                   )}
 

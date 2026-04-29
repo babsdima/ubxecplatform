@@ -55,7 +55,7 @@ export async function CompanyNav({ active }: { active: ActiveTab }) {
           className="font-bold text-xl tracking-tight shrink-0"
           style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
         >
-          Ub<span style={{ color: "var(--accent)" }}>X</span>ec
+          Grade<span style={{ color: "var(--accent)" }}>Up</span>
         </Link>
 
         {/* Nav links */}

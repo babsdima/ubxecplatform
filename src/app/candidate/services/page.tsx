@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Дополнительные услуги — UbXec",
+  title: "Дополнительные услуги — GradeUp",
 };
 
 const services = [
@@ -20,7 +20,7 @@ const services = [
     icon: FileText,
     title: "Ревью профиля",
     description:
-      "Эксперт UbXec разберёт ваш профиль, укажет на слабые места и поможет сформулировать достижения в формате, который привлекает внимание компаний.",
+      "Эксперт GradeUp разберёт ваш профиль, укажет на слабые места и поможет сформулировать достижения в формате, который привлекает внимание компаний.",
     tag: "Разово",
     price: "15 000 ₽",
     benefits: [
@@ -95,7 +95,7 @@ const services = [
     icon: ShieldCheck,
     title: "Приоритетная верификация",
     description:
-      "Ускоренная проверка и верификация профиля в течение 24 часов с персональным разбором от команды UbXec. Подходит, если нужно выйти на рынок быстро.",
+      "Ускоренная проверка и верификация профиля в течение 24 часов с персональным разбором от команды GradeUp. Подходит, если нужно выйти на рынок быстро.",
     tag: "Разово",
     price: "5 000 ₽",
     benefits: [
@@ -168,7 +168,7 @@ export default async function CandidateServicesPage() {
                 <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-50">
                   <span className="text-base font-bold text-slate-900">{s.price}</span>
                   <a
-                    href="mailto:support@ubxec.ru"
+                    href="mailto:support@gradeup.ru"
                     className="text-xs font-semibold px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
                   >
                     {s.cta}
@@ -184,11 +184,11 @@ export default async function CandidateServicesPage() {
           <div>
             <p className="text-sm font-semibold text-slate-800">Нужна индивидуальная программа?</p>
             <p className="text-sm text-slate-500 mt-0.5">
-              Свяжитесь с командой UbXec — составим пакет под ваши задачи и временной горизонт.
+              Свяжитесь с командой GradeUp — составим пакет под ваши задачи и временной горизонт.
             </p>
           </div>
           <a
-            href="mailto:support@ubxec.ru"
+            href="mailto:support@gradeup.ru"
             className="shrink-0 text-sm font-semibold px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors"
           >
             Написать нам

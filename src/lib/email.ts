@@ -24,12 +24,12 @@ export async function sendMutualMatchEmail(params: MutualMatchEmailParams) {
   await Promise.allSettled([
     // Письмо кандидату
     resend.emails.send({
-      from: "UbXec <noreply@ubxec.ru>",
+      from: "GradeUp <noreply@gradeup.ru>",
       to: candidateEmail,
       subject: `Взаимный интерес — позиция ${mandateTitle}`,
       html: `
         <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px;">
-          <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">UbXec</h1>
+          <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">GradeUp</h1>
           <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Взаимный интерес!</h2>
           <p style="color: #555; line-height: 1.6;">
             Компания <strong>${companyName}</strong> отметила интерес к вашему профилю
@@ -45,7 +45,7 @@ export async function sendMutualMatchEmail(params: MutualMatchEmailParams) {
             Открыть мэтчи
           </a>
           <p style="margin-top: 32px; color: #999; font-size: 12px;">
-            UbXec · Анонимный executive search
+            GradeUp · Анонимный executive search
           </p>
         </div>
       `,
@@ -53,12 +53,12 @@ export async function sendMutualMatchEmail(params: MutualMatchEmailParams) {
 
     // Письмо компании
     resend.emails.send({
-      from: "UbXec <noreply@ubxec.ru>",
+      from: "GradeUp <noreply@gradeup.ru>",
       to: companyEmail,
       subject: `Взаимный интерес — кандидат на позицию ${mandateTitle}`,
       html: `
         <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px;">
-          <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">UbXec</h1>
+          <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">GradeUp</h1>
           <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Взаимный интерес!</h2>
           <p style="color: #555; line-height: 1.6;">
             Кандидат <strong>${candidateName}</strong> также отметил интерес к позиции
@@ -74,7 +74,7 @@ export async function sendMutualMatchEmail(params: MutualMatchEmailParams) {
             Открыть позицию
           </a>
           <p style="margin-top: 32px; color: #999; font-size: 12px;">
-            UbXec · Анонимный executive search
+            GradeUp · Анонимный executive search
           </p>
         </div>
       `,

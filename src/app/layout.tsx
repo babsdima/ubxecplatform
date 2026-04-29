@@ -16,24 +16,24 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "UbXec — Executive Search",
+  title: "GradeUp — Развитие. Доход. Возможности.",
   description:
-    "Анонимный маркетплейс для найма топ-менеджеров в России. C-level кандидаты и компании — без посредников, без утечек информации.",
-  metadataBase: new URL("https://ubxec.ru"),
+    "Платформа развития и карьерных возможностей для топ-менеджеров. Быстрый доступ к управленческому таланту для компаний.",
+  metadataBase: new URL("https://gradeup.ru"),
   openGraph: {
     type: "website",
-    url: "https://ubxec.ru",
-    title: "UbXec — Executive Search",
+    url: "https://gradeup.ru",
+    title: "GradeUp — Развитие. Доход. Возможности.",
     description:
-      "Анонимный маркетплейс для найма топ-менеджеров. Скрытый профиль до взаимного интереса. Прямой контакт без агентства.",
-    siteName: "UbXec",
+      "Экосистема для топ-менеджеров: оценка, развитие, монетизация экспертизы и карьерные возможности в одном месте.",
+    siteName: "GradeUp",
     locale: "ru_RU",
   },
   twitter: {
     card: "summary_large_image",
-    title: "UbXec — Executive Search",
+    title: "GradeUp — Развитие. Доход. Возможности.",
     description:
-      "Анонимный маркетплейс для найма топ-менеджеров в России. C-level кандидаты и компании — без посредников.",
+      "Платформа развития и карьерных возможностей для топ-менеджеров. Быстрый доступ к управленческому таланту для компаний.",
   },
   robots: {
     index: true,

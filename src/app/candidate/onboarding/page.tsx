@@ -158,7 +158,7 @@ export default async function CandidateOnboarding() {
                   Создать профиль и отправить на верификацию
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
-                  После верификации командой UbXec (до 24 ч) вы получите первые мэтчи
+                  После верификации командой GradeUp (до 24 ч) вы получите первые мэтчи
                 </p>
               </div>
             </form>

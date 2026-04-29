@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Комьюнити лидеров — UbXec",
+  title: "Комьюнити лидеров — GradeUp",
   description:
     "Закрытое сообщество топ-менеджеров: нетворк, мероприятия, обмен опытом и новые возможности.",
 };
@@ -270,7 +270,7 @@ export default function CommunityPage() {
                   <Link href="/auth/register?role=COMPANY" className="inline-flex items-center gap-2 rounded-xl text-sm font-bold border" style={{ padding: "12px 22px", borderColor: "hsl(var(--ink-800))", color: "hsl(var(--ink-800))" }}>
                     Стать партнёром <ArrowRight size={14} />
                   </Link>
-                  <a href="mailto:hello@ubxec.ru" className="inline-flex items-center gap-2 rounded-xl text-sm font-medium border" style={{ padding: "12px 18px", borderColor: "hsl(var(--neutral-200))", color: "hsl(var(--neutral-600))" }}>
+                  <a href="mailto:hello@gradeup.ru" className="inline-flex items-center gap-2 rounded-xl text-sm font-medium border" style={{ padding: "12px 18px", borderColor: "hsl(var(--neutral-200))", color: "hsl(var(--neutral-600))" }}>
                     Обсудить условия
                   </a>
                 </div>
@@ -287,7 +287,7 @@ export default function CommunityPage() {
                 {
                   icon: <EyeOff size={22} color="#475569" />,
                   title: "Закрытый формат",
-                  body: "Только верифицированные C-level специалисты. Ручная проверка каждого участника командой UbXec гарантирует качество аудитории.",
+                  body: "Только верифицированные C-level специалисты. Ручная проверка каждого участника командой GradeUp гарантирует качество аудитории.",
                 },
                 {
                   icon: <Sparkles size={22} color="#475569" />,
@@ -329,7 +329,7 @@ export default function CommunityPage() {
               <Link href="/auth/register" className="inline-flex items-center gap-2 rounded-xl text-sm font-bold" style={{ padding: "14px 26px", background: "var(--accent)", color: "#fff" }}>
                 <Users size={16} />Вступить в комьюнити
               </Link>
-              <a href="mailto:hello@ubxec.ru" className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold" style={{ padding: "14px 22px", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.65)", border: "1px solid rgba(255,255,255,0.12)" }}>
+              <a href="mailto:hello@gradeup.ru" className="inline-flex items-center gap-2 rounded-xl text-sm font-semibold" style={{ padding: "14px 22px", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.65)", border: "1px solid rgba(255,255,255,0.12)" }}>
                 Написать организаторам
               </a>
             </div>
@@ -340,7 +340,7 @@ export default function CommunityPage() {
       {/* ── FOOTER ──────────────────────────────────────────────────────── */}
       <footer style={{ background: "hsl(var(--ink-900))", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
         <div className="max-w-6xl mx-auto px-7 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 flex-wrap">
-          <span style={{ fontFamily: "var(--font-display)", color: "rgba(255,255,255,0.25)", fontSize: 14 }}>UbXec</span>
+          <span style={{ fontFamily: "var(--font-display)", color: "rgba(255,255,255,0.25)", fontSize: 14 }}>GradeUp</span>
           <p style={{ fontSize: 11, color: "rgba(255,255,255,0.15)" }}>© 2026 · Premium Executive Platform · Москва</p>
           <div className="flex gap-5 flex-wrap justify-center">
             {[

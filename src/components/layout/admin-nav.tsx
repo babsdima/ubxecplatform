@@ -10,7 +10,7 @@ export async function AdminNav({ active }: { active: "dashboard" | "candidates" 
   return (
     <header className="bg-background border-b sticky top-0 z-10">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/admin" className="font-bold text-lg">UbXec Admin</Link>
+        <Link href="/admin" className="font-bold text-lg">GradeUp Admin</Link>
         <nav className="flex gap-5 items-center">
           <NavLink href="/admin" active={active === "dashboard"}>Дашборд</NavLink>
           <NavLink href="/admin/candidates" active={active === "candidates"}>
