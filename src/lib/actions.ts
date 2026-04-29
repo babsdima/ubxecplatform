@@ -53,6 +53,7 @@ export async function logoutAction() {
 
 export async function saveCandidateProfile(formData: FormData, userId: string, isEdit = false) {
   const formats = formData.getAll("engagementFormats") as string[];
+  const statuses = formData.getAll("careerStatuses") as string[];
   const data = {
     currentTitle: formData.get("currentTitle") as string,
     industry: formData.get("industry") as string,
@@ -63,6 +64,8 @@ export async function saveCandidateProfile(formData: FormData, userId: string, i
     locationPref: formData.get("locationPref") as string,
     functionalFocus: formData.get("functionalFocus") as string,
     engagementFormats: formats.length > 0 ? formats.join(",") : "full-time",
+    careerStatuses: statuses.join(","),
+    profileVisibility: (formData.get("profileVisibility") as string) || "anonymous",
   };
 
   await prisma.candidateProfile.upsert({
@@ -129,7 +132,7 @@ export async function createMandate(formData: FormData, companyId: string) {
       salaryMax: parseInt(formData.get("salaryMax") as string),
       description: formData.get("description") as string,
       requirements: formData.get("requirements") as string,
-      isAnonymous: formData.get("isAnonymous") === "on",
+      isAnonymous: formData.get("isAnonymous") === "true",
       mandateType: (formData.get("mandateType") as string) || "full-time",
       status: "ACTIVE",
     },

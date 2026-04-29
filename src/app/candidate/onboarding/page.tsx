@@ -15,6 +15,13 @@ const ENGAGEMENT_OPTIONS = [
   { value: "board", label: "Advisory Board" },
 ];
 
+const CAREER_STATUS_OPTIONS = [
+  { value: "active_search", label: "В активном поиске", desc: "Открыт к предложениям прямо сейчас" },
+  { value: "open_consulting", label: "Готов к консалтингу", desc: "Проектная работа, advisory" },
+  { value: "open_mentoring", label: "Готов к менторству", desc: "Развитие команд и руководителей" },
+  { value: "open_board", label: "Готов к участию в советах директоров", desc: "Board member, независимый директор" },
+];
+
 export default async function CandidateOnboarding() {
   const session = await auth();
   if (!session) redirect("/auth/login");
@@ -150,6 +157,74 @@ export default async function CandidateOnboarding() {
                       <span className="text-sm">{label}</span>
                     </label>
                   ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label>Карьерный статус *</Label>
+                <p className="text-xs text-muted-foreground">
+                  Выберите один или несколько — это показывает компаниям, к чему вы открыты прямо сейчас
+                </p>
+                <div className="space-y-2">
+                  {CAREER_STATUS_OPTIONS.map(({ value, label, desc }) => (
+                    <label
+                      key={value}
+                      className="flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        name="careerStatuses"
+                        value={value}
+                        className="h-4 w-4 mt-0.5"
+                      />
+                      <div>
+                        <span className="text-sm font-medium">{label}</span>
+                        <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label>Видимость профиля *</Label>
+                <p className="text-xs text-muted-foreground">
+                  Определяет, кто и когда видит вашу личность
+                </p>
+                <div className="grid grid-cols-1 gap-2">
+                  <label className="flex items-start gap-3 p-4 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors">
+                    <input
+                      type="radio"
+                      name="profileVisibility"
+                      value="anonymous"
+                      defaultChecked
+                      className="h-4 w-4 mt-0.5"
+                    />
+                    <div>
+                      <span className="text-sm font-medium flex items-center gap-2">
+                        🔒 Анонимный профиль
+                      </span>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Имя, компания и контакты скрыты. Раскрываются только при взаимном интересе — когда и вы, и компания подтвердили мэтч.
+                      </p>
+                    </div>
+                  </label>
+                  <label className="flex items-start gap-3 p-4 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors">
+                    <input
+                      type="radio"
+                      name="profileVisibility"
+                      value="open"
+                      className="h-4 w-4 mt-0.5"
+                    />
+                    <div>
+                      <span className="text-sm font-medium flex items-center gap-2">
+                        🌐 Открытый профиль
+                      </span>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Компании видят ваш полный профиль, включая имя и текущее место работы, без предварительного мэтча.
+                      </p>
+                    </div>
+                  </label>
                 </div>
               </div>
 

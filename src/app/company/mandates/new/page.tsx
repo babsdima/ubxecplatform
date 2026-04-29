@@ -122,15 +122,41 @@ export default async function NewMandatePage() {
                 </p>
               </div>
 
-              <div className="flex items-start gap-3 p-3 rounded-lg border bg-muted/30">
-                <input type="checkbox" id="isAnonymous" name="isAnonymous" className="h-4 w-4 mt-0.5" />
-                <div>
-                  <Label htmlFor="isAnonymous" className="cursor-pointer font-medium">
-                    Конфиденциальный поиск
-                  </Label>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Название компании скрыто до взаимного интереса — кандидаты видят только индустрию и описание
-                  </p>
+              <div className="space-y-3">
+                <Label>Статус вакансии *</Label>
+                <p className="text-xs text-muted-foreground">
+                  Определяет, как вакансия отображается кандидатам
+                </p>
+                <div className="grid grid-cols-1 gap-2">
+                  <label className="flex items-start gap-3 p-4 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors">
+                    <input
+                      type="radio"
+                      name="isAnonymous"
+                      value="false"
+                      defaultChecked
+                      className="h-4 w-4 mt-0.5"
+                    />
+                    <div>
+                      <span className="text-sm font-medium">🌐 Открытая вакансия</span>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Название компании видно всем подходящим кандидатам. Вакансия появляется в общем доступе в рамках платформы.
+                      </p>
+                    </div>
+                  </label>
+                  <label className="flex items-start gap-3 p-4 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors">
+                    <input
+                      type="radio"
+                      name="isAnonymous"
+                      value="true"
+                      className="h-4 w-4 mt-0.5"
+                    />
+                    <div>
+                      <span className="text-sm font-medium">🔒 Закрытая вакансия</span>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Кандидаты видят только отрасль и описание — без названия компании. Контакты и название раскрываются только при взаимном мэтче.
+                      </p>
+                    </div>
+                  </label>
                 </div>
               </div>
 

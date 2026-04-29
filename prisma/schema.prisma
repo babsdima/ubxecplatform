@@ -42,6 +42,8 @@ model CandidateProfile {
   linkedinUrl    String?
 
   engagementFormats String @default("full-time")
+  careerStatuses    String @default("")
+  profileVisibility String @default("anonymous")
 
   status    String  @default("PENDING")
   adminNote String?
