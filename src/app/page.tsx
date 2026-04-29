@@ -1,6 +1,14 @@
 import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth();
+  if (session?.user) {
+    if (session.user.role === "CANDIDATE") redirect("/candidate/dashboard");
+    if (session.user.role === "COMPANY") redirect("/company/dashboard");
+    if (session.user.role === "ADMIN") redirect("/admin");
+  }
   return (
     <main className="min-h-screen bg-background text-foreground">
       {/* Nav */}
