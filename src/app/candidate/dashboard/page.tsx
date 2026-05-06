@@ -269,12 +269,13 @@ export default async function CandidateDashboard() {
           </div>
         </div>
 
-        {/* Salary benchmark */}
+        {/* Salary benchmark — market-based (курируемые данные, не peer-aggregated) */}
         <SalaryBenchmark
-          candidateId={profile.id}
-          industry={profile.industry}
-          salaryMin={profile.salaryMin}
-          salaryMax={profile.salaryMax}
+          functions={(profile.currentFunction as string[] | null) ?? []}
+          currentTitle={profile.currentTitle}
+          companyRevenue={profile.companyRevenue}
+          candidateMinRub={profile.salaryMin}
+          candidateMaxRub={profile.salaryMax}
         />
 
         {/* Quick actions */}

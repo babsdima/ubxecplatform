@@ -491,6 +491,31 @@ model Industry {
   @@map("industries")
 }
 
+// Курируемые бенчмарки рынка по компенсации.
+// Заполняются вручную/админом по результатам отдельного market research
+// (Korn Ferry survey, Antal, Hays, etc.). НЕ агрегируются из кандидатов.
+model MarketSalaryBenchmark {
+  id          String   @id @default(cuid())
+  role        String   // CEO | CFO | CTO | COO | CHRO | CMO | CPO
+  companySize String   // small (< 1B) | mid (1-10B) | large (> 10B)
+  industry    String?  // null = все отрасли; конкретный — fintech, manufacturing и т.д.
+
+  // Percentiles total cash (fixed + bonus) в млн ₽/год
+  p25    Int
+  median Int
+  p75    Int
+  p90    Int?
+
+  sampleSize  Int? // количество точек данных в источнике (если известно)
+  source      String? // краткое описание источника
+  methodology String? // развёрнутое описание методологии
+  asOfDate    DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([role, companySize, industry])
+  @@map("market_salary_benchmarks")
+}
+
 // Pre-filled шаблоны для R.1–R.7
 model RoleTemplate {
   id      String @id // "ceo_growth" | "cfo_pe_backed" | ...
