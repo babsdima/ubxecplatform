@@ -18,7 +18,39 @@ export async function SalaryBenchmark({ candidateId, industry, salaryMin, salary
     select: { salaryMin: true, salaryMax: true },
   });
 
-  if (peers.length < 2) return null;
+  if (peers.length < 2) {
+    return (
+      <div className="rounded-xl border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-primary/[0.02] overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-primary/10 bg-primary/5">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/15 flex items-center justify-center">
+              <BarChart3 className="w-3.5 h-3.5 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-primary uppercase tracking-wider">Данные рынка</p>
+              <p className="text-[11px] text-muted-foreground leading-tight">Бенчмарк по доходам</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-background/60 px-2.5 py-1 rounded-full border border-border/50">
+            <Users className="w-3 h-3" />
+            {peers.length} в отрасли
+          </div>
+        </div>
+        <div className="p-4">
+          <div className="flex items-start gap-2.5 text-xs text-muted-foreground bg-background/50 rounded-lg px-3 py-3 border border-border/40">
+            <TrendingUp className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary/60" />
+            <div className="space-y-1">
+              <p className="text-foreground font-medium">Пока недостаточно данных по отрасли «{industry}»</p>
+              <p className="leading-relaxed">
+                Бенчмарк появится автоматически, когда в платформе будет минимум 2 верифицированных
+                кандидата с такой же отраслью. Сейчас в пуле — {peers.length}.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const myMid = (salaryMin + salaryMax) / 2;
   const peerMids = peers
