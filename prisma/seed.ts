@@ -595,7 +595,7 @@ async function main() {
   const co1 = await prisma.user.upsert({
     where: { email: "hr@pecapital.ru" },
     update: {},
-    create: { email: "hr@pecapital.ru", password, role: "EMPLOYER" },
+    create: { email: "hr@pecapital.ru", password, role: "COMPANY" },
   });
   const co1Profile = await prisma.companyProfile.upsert({
     where: { userId: co1.id },
@@ -631,7 +631,7 @@ async function main() {
   const co2 = await prisma.user.upsert({
     where: { email: "hr@techscale.ru" },
     update: {},
-    create: { email: "hr@techscale.ru", password, role: "EMPLOYER" },
+    create: { email: "hr@techscale.ru", password, role: "COMPANY" },
   });
   const co2Profile = await prisma.companyProfile.upsert({
     where: { userId: co2.id },
