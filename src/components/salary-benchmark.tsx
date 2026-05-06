@@ -145,16 +145,6 @@ function BenchmarkView({
   const myMidRub = candidateMinRub && candidateMaxRub ? (candidateMinRub + candidateMaxRub) / 2 : null;
   const myMidM = myMidRub ? myMidRub / 1_000_000 : null;
 
-  const max = benchmark.p90 ?? benchmark.p75 + (benchmark.p75 - benchmark.median);
-  const min = benchmark.p25 * 0.6; // визуальный левый край (расширяем диапазон чуть ниже P25)
-  const range = max - min;
-
-  const myPos = myMidM !== null ? Math.max(0, Math.min(100, ((myMidM - min) / range) * 100)) : null;
-  const p25Pos = ((benchmark.p25 - min) / range) * 100;
-  const medianPos = ((benchmark.median - min) / range) * 100;
-  const p75Pos = ((benchmark.p75 - min) / range) * 100;
-  const p90Pos = benchmark.p90 ? ((benchmark.p90 - min) / range) * 100 : null;
-
   // Position interpretation
   let percentileRange: string;
   let positionLabel: string;
@@ -217,49 +207,8 @@ function BenchmarkView({
           {positionLabel}
         </div>
 
-        {/* Track */}
-        <div className="space-y-2">
-          <div className="relative h-10">
-            {/* Background gradient — left to right: rose (low) → amber → emerald (high) */}
-            <div className="absolute top-3 left-0 right-0 h-2 rounded-full bg-gradient-to-r from-rose-100 via-amber-100 to-emerald-100" />
-
-            {/* P25-P75 bracket */}
-            <div
-              className="absolute top-3 h-2 rounded-full bg-emerald-200/60"
-              style={{ left: `${p25Pos}%`, width: `${p75Pos - p25Pos}%` }}
-            />
-
-            {/* Median tick */}
-            <div className="absolute top-1 flex flex-col items-center" style={{ left: `${medianPos}%`, transform: "translateX(-50%)" }}>
-              <div className="w-px h-6 bg-emerald-700/50" />
-              <div className="text-[9px] text-emerald-700/80 mt-0.5 whitespace-nowrap">медиана</div>
-            </div>
-
-            {/* P25 + P75 ticks */}
-            {[p25Pos, p75Pos, ...(p90Pos !== null ? [p90Pos] : [])].map((pos, idx) => (
-              <div
-                key={idx}
-                className="absolute top-2 w-px h-4 bg-muted-foreground/30"
-                style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
-              />
-            ))}
-
-            {/* My dot */}
-            {myPos !== null && (
-              <div
-                className="absolute top-2 w-4 h-4 rounded-full bg-primary border-2 border-background shadow-md ring-2 ring-primary/20"
-                style={{ left: `${myPos}%`, transform: "translateX(-50%)" }}
-                title={myMidM ? `Вы: ${myMidM.toFixed(1)} млн` : ""}
-              />
-            )}
-          </div>
-
-          {/* Scale labels */}
-          <div className="flex justify-between text-[11px] text-muted-foreground">
-            <span>{Math.round(min)} млн</span>
-            <span>{Math.round(max)} млн</span>
-          </div>
-        </div>
+        {/* Bell curve histogram with percentile bands */}
+        <BenchmarkCurve benchmark={benchmark} candidateMidM={myMidM} />
 
         {/* Key percentiles row */}
         <div className="grid grid-cols-4 gap-2">
@@ -295,6 +244,165 @@ function BenchmarkView({
             <span className="text-muted-foreground/70">total cash без equity</span>
           </span>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────
+//  Bell curve histogram (стиль Бенчи.png)
+// ────────────────────────────────────────────────────────────────────
+
+const N_BARS = 28;
+
+function BenchmarkCurve({
+  benchmark,
+  candidateMidM,
+}: {
+  benchmark: BenchData;
+  candidateMidM: number | null;
+}) {
+  // Normal distribution params: median = mean μ; σ из IQR (P75 - P25) / 1.349
+  const mu = benchmark.median;
+  const sigma = Math.max((benchmark.p75 - benchmark.p25) / 1.349, 0.1);
+
+  // Estimate P10 от нормали (z ≈ -1.282)
+  const p10 = Math.max(0, mu - 1.282 * sigma);
+  // Estimate P90 если нет в данных (z ≈ +1.282)
+  const p90 = benchmark.p90 ?? mu + 1.282 * sigma;
+
+  // Visual range: чуть шире P10 / P90, чтобы хвосты гистограммы были видны
+  const xMin = Math.max(0, p10 - sigma * 0.7);
+  const xMax = p90 + sigma * 0.7;
+  const xRange = xMax - xMin;
+
+  // Compute bar heights (normal PDF)
+  const bars = Array.from({ length: N_BARS }, (_, i) => {
+    const x = xMin + (i + 0.5) * (xRange / N_BARS);
+    const pdf =
+      (1 / (sigma * Math.sqrt(2 * Math.PI))) *
+      Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2));
+    return { x, pdf };
+  });
+  const maxPdf = Math.max(...bars.map((b) => b.pdf));
+  const barsNorm = bars.map((b) => ({ ...b, h: (b.pdf / maxPdf) * 100 }));
+
+  // Кандидат
+  const candidateBarIdx =
+    candidateMidM !== null && candidateMidM >= xMin && candidateMidM <= xMax
+      ? Math.min(N_BARS - 1, Math.floor((candidateMidM - xMin) / (xRange / N_BARS)))
+      : -1;
+  const candidateOffRange =
+    candidateMidM !== null && (candidateMidM < xMin || candidateMidM > xMax);
+
+  // Helper: x → % of width
+  const xToPct = (x: number) => Math.max(0, Math.min(100, ((x - xMin) / xRange) * 100));
+
+  // Percentile boundaries → positions on x-axis
+  const p10Pos = xToPct(p10);
+  const p25Pos = xToPct(benchmark.p25);
+  const p50Pos = xToPct(benchmark.median);
+  const p75Pos = xToPct(benchmark.p75);
+  const p90Pos = xToPct(p90);
+
+  // Background bands — alternating 6 zones: <10, 10-25, 25-50, 50-75, 75-90, >90
+  const bands = [
+    { from: 0, to: p10Pos, alt: false },
+    { from: p10Pos, to: p25Pos, alt: true },
+    { from: p25Pos, to: p50Pos, alt: false },
+    { from: p50Pos, to: p75Pos, alt: true },
+    { from: p75Pos, to: p90Pos, alt: false },
+    { from: p90Pos, to: 100, alt: true },
+  ];
+
+  return (
+    <div className="space-y-2">
+      {/* Bars + bands */}
+      <div className="relative h-32 select-none">
+        {/* Background bands */}
+        {bands.map((b, i) => (
+          <div
+            key={i}
+            className={b.alt ? "bg-blue-50/50" : "bg-transparent"}
+            style={{
+              position: "absolute",
+              left: `${b.from}%`,
+              width: `${Math.max(0, b.to - b.from)}%`,
+              top: 0,
+              bottom: 0,
+            }}
+          />
+        ))}
+
+        {/* Bars (absolute on top of bands) */}
+        <div className="absolute inset-0 flex items-end gap-px px-0.5">
+          {barsNorm.map((bar, i) => {
+            const isCandidate = i === candidateBarIdx;
+            return (
+              <div
+                key={i}
+                className={`flex-1 rounded-t-sm transition-colors ${
+                  isCandidate
+                    ? "bg-emerald-600"
+                    : "bg-blue-500/70"
+                }`}
+                style={{
+                  height: `${Math.max(bar.h, 1)}%`,
+                  ...(isCandidate
+                    ? {
+                        boxShadow: "0 0 0 2px rgba(16,185,129,0.25)",
+                      }
+                    : {}),
+                }}
+                title={`${bar.x.toFixed(1)} млн ₽`}
+              />
+            );
+          })}
+        </div>
+
+        {/* Off-range marker — стрелка слева/справа если кандидат за пределами */}
+        {candidateOffRange && candidateMidM !== null && (
+          <div
+            className="absolute top-1/2 -translate-y-1/2 text-emerald-600 text-xs font-bold"
+            style={
+              candidateMidM < xMin
+                ? { left: 4 }
+                : { right: 4 }
+            }
+          >
+            {candidateMidM < xMin ? "◀ ваш" : "ваш ▶"}
+          </div>
+        )}
+      </div>
+
+      {/* Percentile labels — позиционированы по фактическому P-значению на оси */}
+      <div className="relative h-5">
+        {[
+          { label: "10p", pos: p10Pos },
+          { label: "25p", pos: p25Pos },
+          { label: "50p", pos: p50Pos },
+          { label: "75p", pos: p75Pos },
+          { label: "90p", pos: p90Pos },
+        ].map(({ label, pos }) => (
+          <div
+            key={label}
+            className="absolute text-[11px] font-bold text-slate-600 top-0"
+            style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
+          >
+            {label}
+          </div>
+        ))}
+      </div>
+
+      {/* Scale labels */}
+      <div className="flex justify-between text-[11px] text-muted-foreground pt-1">
+        <span>{Math.round(xMin)} млн</span>
+        {candidateMidM !== null && !candidateOffRange && (
+          <span className="text-emerald-700 font-medium">
+            Вы: {candidateMidM.toFixed(1)} млн
+          </span>
+        )}
+        <span>{Math.round(xMax)} млн</span>
       </div>
     </div>
   );
