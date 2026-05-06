@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { logoutAction } from "@/lib/actions";
 
-type ActiveTab = "dashboard" | "matches" | "profile" | "services" | "assessment";
+type ActiveTab = "dashboard" | "matches" | "profile" | "services" | "assessment" | "results";
 
 export async function CandidateNav({ active }: { active: ActiveTab }) {
   const session = await auth();
@@ -33,8 +33,9 @@ export async function CandidateNav({ active }: { active: ActiveTab }) {
   const links: { href: string; label: string; tab: ActiveTab; badge?: number | boolean }[] = [
     { href: "/candidate/dashboard", label: "Дашборд", tab: "dashboard" },
     { href: "/candidate/matches", label: "Мэтчи", tab: "matches", badge: pending > 0 ? pending : newMutual > 0 ? true : undefined },
+    { href: "/candidate/assessment", label: "Опросник", tab: "assessment" },
+    { href: "/candidate/results", label: "Карта лидерства", tab: "results" },
     { href: "/candidate/profile", label: "Профиль", tab: "profile" },
-    { href: "/candidate/assessment", label: "Оценка", tab: "assessment" },
     { href: "/candidate/services", label: "Услуги", tab: "services" },
   ];
 

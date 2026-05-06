@@ -1,59 +1,93 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { CompanyProfileForm } from "./profile-form";
 import { CompanyNav } from "@/components/layout/company-nav";
+import { CompanyProfileWizard } from "@/components/employer/company-profile-wizard";
+import type { CompanyProfilePatch } from "@/lib/employer/actions";
 
-export default async function CompanyProfilePage() {
+type SearchParams = { step?: string };
+
+export default async function CompanyProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   const session = await auth();
-  if (!session) redirect("/auth/login");
+  if (!session?.user?.id) redirect("/auth/login");
+
+  const { step } = await searchParams;
+  const initialStep = step ? Math.max(1, Math.min(8, Number(step))) : 1;
 
   const company = await prisma.companyProfile.findUnique({
     where: { userId: session.user.id },
   });
   if (!company) redirect("/company/onboarding");
 
+  const industries = await prisma.industry.findMany({
+    orderBy: { order: "asc" },
+    select: { id: true, nameRu: true },
+  });
+
+  const initial: CompanyProfilePatch = {
+    name: company.name ?? company.companyName ?? "",
+    legalEntity: company.legalEntity ?? "",
+    yearFounded: company.yearFounded,
+    descriptionShort: company.descriptionShort ?? "",
+    descriptionFull: company.descriptionFull ?? "",
+    mainProduct: company.mainProduct ?? "",
+    industryPrimary: company.industryPrimary ?? "",
+    industriesSecondary: (company.industriesSecondary as string[] | null) ?? [],
+    companyType: company.companyType ?? "",
+    b2bB2c: company.b2bB2c ?? "",
+    revenueRange: company.revenueRange ?? "",
+    employeeCount: company.employeeCount ?? "",
+    geography: (company.geography as string[] | null) ?? [],
+    hqCity: company.hqCity ?? "",
+    stage: company.stage ?? "",
+    growthChallenges:
+      (company.growthChallenges as { top3?: string[]; all?: string[] } | null) ?? {},
+    revenueGrowth: company.revenueGrowth ?? "",
+    growthPlan: company.growthPlan ?? "",
+    cultureAsIs:
+      (company.cultureAsIs as { D1: number; D2: number; D3: number; D4: number } | null) ??
+      undefined,
+    cultureToBe:
+      (company.cultureToBe as { D1: number; D2: number; D3: number; D4: number } | null) ??
+      undefined,
+    workingStyle:
+      (company.workingStyle as { pace: number; structure: number; risk: number; focus: number } | null) ??
+      undefined,
+    culturalMarkers: (company.culturalMarkers as string[] | null) ?? [],
+    leadershipStyleRanking:
+      (company.leadershipStyleRanking as [string, number][] | null) ?? [],
+    leaderExpectationsTop3: (company.leaderExpectationsTop3 as string[] | null) ?? [],
+    workFormat: company.workFormat ?? "",
+    travelFrequency: company.travelFrequency ?? "",
+    compPositioning: company.compPositioning ?? "",
+    hiringDecisionMakers: (company.hiringDecisionMakers as string[] | null) ?? [],
+    values:
+      (company.values as { name: string; description: string }[] | null) ?? [],
+    evp: company.evp ?? "",
+    honestChallenges: company.honestChallenges ?? "",
+    cLevelTeam:
+      (company.cLevelTeam as { role: string; filled: boolean; tenure?: string; source?: string }[] | null) ??
+      [],
+    teamDynamics: (company.teamDynamics as string[] | null) ?? [],
+    showName: company.showName,
+    codename: company.codename ?? "",
+    showLogo: company.showLogo,
+    notifyRejected: company.notifyRejected,
+  };
+
   return (
     <div className="dash-bg">
       <CompanyNav active="profile" />
-
-      {/* Dark header */}
-      <div className="dash-hero">
-        <div className="max-w-2xl mx-auto px-5 pt-10 pb-2 relative z-10 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold tracking-widest uppercase mb-2"
-              style={{ color: "rgba(255,255,255,0.35)" }}>Компания</p>
-            <h1
-              className="text-3xl font-bold tracking-tight"
-              style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
-            >
-              Профиль компании
-            </h1>
-          </div>
-          {company.isVerified ? (
-            <span className="badge-verified mb-1 shrink-0">Верифицирована</span>
-          ) : (
-            <span className="text-xs font-semibold px-3 py-1.5 rounded-full shrink-0 mb-1"
-              style={{ background: "var(--warning-bg)", color: "var(--warning)", border: "1px solid var(--warning-border)" }}>
-              На проверке
-            </span>
-          )}
-        </div>
-      </div>
-
-      <main className="max-w-2xl mx-auto px-5 pt-6 pb-10 -mt-2">
-        {!company.isVerified && (
-          <div className="mb-6 pc-amber p-4 pl-5">
-            <p className="text-sm text-amber-800 font-medium">
-              <strong>Верификация в процессе.</strong> Команда GradeUp проверит информацию о компании в течение 24 часов.
-              Это не блокирует создание позиций и мэтчинг.
-            </p>
-          </div>
-        )}
-        <div className="pc p-6">
-          <CompanyProfileForm company={company} userId={session.user.id} />
-        </div>
-      </main>
+      <CompanyProfileWizard
+        industries={industries}
+        initial={initial}
+        initialStep={initialStep}
+        initialCompletion={company.profileCompletion}
+      />
     </div>
   );
 }

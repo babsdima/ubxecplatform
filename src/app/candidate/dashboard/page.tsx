@@ -280,11 +280,12 @@ export default async function CandidateDashboard() {
         {/* Quick actions */}
         <div className="pc p-6">
           <p className="eyebrow mb-4">Быстрые действия</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             {[
-              { href: "/candidate/profile",    icon: FileText,  label: "Редактировать профиль" },
+              { href: "/candidate/profile",    icon: FileText,  label: "Профиль" },
               { href: "/candidate/matches",    icon: Sparkles,  label: "Все мэтчи" },
-              { href: "/candidate/assessment", icon: Star,      label: "Оценка" },
+              { href: "/candidate/assessment", icon: Star,      label: "Опросник" },
+              { href: "/candidate/results",    icon: BarChart2, label: "Карта лидерства" },
               { href: "/candidate/services",   icon: BarChart2, label: "Услуги" },
             ].map(({ href, icon: Icon, label }) => (
               <Link

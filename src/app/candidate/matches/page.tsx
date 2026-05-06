@@ -1,298 +1,384 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { InterestButton } from "@/components/interest-button";
+import Link from "next/link";
 import { CandidateNav } from "@/components/layout/candidate-nav";
-import { TabFilters } from "@/components/tab-filters";
-import { ScoreBreakdownWidget } from "@/components/score-breakdown";
-import { Suspense } from "react";
-import { CheckCircle2, Lock } from "lucide-react";
+import { InterestButton } from "@/components/interest-button";
+import { OverallScoreRing } from "@/components/charts/overall-score-ring";
+import { ScoreBar } from "@/components/charts/score-bar";
+import {
+  Briefcase,
+  Building2,
+  MapPin,
+  Wallet,
+  AlertTriangle,
+  CheckCircle2,
+  Lock,
+} from "lucide-react";
+import { triggerScoringForCandidate } from "@/lib/scoring/actions";
 
-const MANDATE_TYPE_LABEL: Record<string, string> = {
-  "full-time": "Найм в штат",
-  mentor:      "Ментор",
-  consultant:  "Консультант",
-  board:       "Advisory Board",
+type ComponentScores = {
+  competency: number;
+  trackRecord: number;
+  personality: number;
+  risk: number;
+  motivational: number;
+  cultural: number;
 };
 
-const MANDATE_TYPE_COLOR: Record<string, string> = {
-  "full-time": "bg-slate-100 text-slate-600",
-  mentor:      "bg-violet-50 text-violet-600",
-  consultant:  "bg-blue-50 text-blue-600",
-  board:       "bg-amber-50 text-amber-700",
+type Flag = {
+  scale: string;
+  severity: "red" | "yellow";
+  message: string;
 };
 
-export default async function CandidateMatches({
-  searchParams,
-}: {
-  searchParams: Promise<{ filter?: string }>;
-}) {
+const COMP_LABEL: Record<string, string> = {
+  "5_10M": "5–10 млн ₽",
+  "10_15M": "10–15 млн ₽",
+  "15_25M": "15–25 млн ₽",
+  "25_40M": "25–40 млн ₽",
+  "40_60M": "40–60 млн ₽",
+  "60M+": "60+ млн ₽",
+};
+
+export default async function CandidateMatches() {
   const session = await auth();
-  if (!session) redirect("/auth/login");
-
-  const { filter } = await searchParams;
+  if (!session?.user?.id) redirect("/auth/login");
 
   const profile = await prisma.candidateProfile.findUnique({
     where: { userId: session.user.id },
+    select: { id: true },
   });
   if (!profile) redirect("/candidate/onboarding");
 
-  const allMatches = await prisma.match.findMany({
-    where: { candidateProfileId: profile.id },
+  const matches = await prisma.match.findMany({
+    where: {
+      candidateProfileId: profile.id,
+      score: { gte: 35 }, // отсекаем явные mismatch
+    },
     include: {
       mandate: {
         include: {
           company: {
             select: {
+              name: true,
               companyName: true,
-              description: true,
-              website: true,
-              size: true,
-              industry: true,
+              descriptionShort: true,
+              industryPrimary: true,
+              companyType: true,
             },
           },
         },
       },
     },
-    orderBy: [{ status: "asc" }, { score: "desc" }],
+    orderBy: { score: "desc" },
   });
 
-  const filtered = (() => {
-    switch (filter) {
-      case "mutual":     return allMatches.filter((m) => m.status === "MUTUAL");
-      case "interested": return allMatches.filter((m) => m.candidateInterest && m.status !== "MUTUAL");
-      case "new":        return allMatches.filter((m) => !m.candidateInterest && m.status !== "MUTUAL");
-      default:           return allMatches;
-    }
-  })();
-
-  const counts = {
-    all:       allMatches.length,
-    new:       allMatches.filter((m) => !m.candidateInterest && m.status !== "MUTUAL").length,
-    interested: allMatches.filter((m) => m.candidateInterest && m.status !== "MUTUAL").length,
-    mutual:    allMatches.filter((m) => m.status === "MUTUAL").length,
-  };
-
-  const tabs = [
-    { value: "",           label: "Все",              count: counts.all },
-    { value: "new",        label: "Новые",            count: counts.new },
-    { value: "interested", label: "Интерес отмечен",  count: counts.interested },
-    { value: "mutual",     label: "Взаимные",         count: counts.mutual },
-  ];
+  const mutualMatches = matches.filter((m) => m.status === "MUTUAL");
+  const pendingMatches = matches.filter(
+    (m) => m.status !== "MUTUAL" && !m.candidateInterest,
+  );
+  const interestedMatches = matches.filter(
+    (m) => m.candidateInterest && m.status !== "MUTUAL",
+  );
 
   return (
     <div className="dash-bg">
       <CandidateNav active="matches" />
 
-      {/* Dark page header */}
       <div className="dash-hero">
-        <div className="max-w-5xl mx-auto px-5 pt-10 pb-2 relative z-10 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold tracking-widest uppercase mb-2"
-              style={{ color: "rgba(255,255,255,0.35)" }}>Кандидат</p>
-            <h1
-              className="text-3xl font-bold tracking-tight"
-              style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
-            >
-              Мои мэтчи
-            </h1>
-            <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
-              {counts.all} позиций · {counts.mutual} взаимных
-            </p>
-          </div>
-          {counts.mutual > 0 && (
-            <span className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full font-medium shrink-0"
-              style={{ background: "rgba(22,163,74,0.15)", color: "#4ade80", border: "1px solid rgba(22,163,74,0.3)" }}>
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              {counts.mutual} взаимных
-            </span>
-          )}
+        <div className="max-w-4xl mx-auto px-5 pt-10 pb-2 relative z-10">
+          <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: "rgba(255,255,255,0.35)" }}>
+            Кандидат
+          </p>
+          <h1
+            className="text-3xl font-bold tracking-tight"
+            style={{ fontFamily: "var(--font-playfair), Georgia, serif", color: "hsl(40 33% 96%)" }}
+          >
+            Мэтчи
+          </h1>
+          <p className="text-sm mt-1 leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>
+            Подобранные роли. Выразите интерес — компания увидит ваш профиль анонимно.
+            При взаимном интересе откроются контакты.
+          </p>
         </div>
       </div>
 
-      <main className="max-w-5xl mx-auto px-5 pt-6 pb-10 -mt-2">
-
-        {allMatches.length > 0 && (
-          <Suspense>
-            <TabFilters tabs={tabs} />
-          </Suspense>
+      <main className="max-w-4xl mx-auto px-5 pt-6 pb-12 -mt-2 space-y-8">
+        {/* Mutual matches */}
+        {mutualMatches.length > 0 && (
+          <section>
+            <SectionHeader
+              title="Взаимный интерес"
+              subtitle={`${mutualMatches.length} • контакты раскрыты`}
+              accent="green"
+            />
+            <div className="space-y-3 mt-3">
+              {mutualMatches.map((m) => (
+                <RoleCard key={m.id} match={m} mutual />
+              ))}
+            </div>
+          </section>
         )}
 
-        {filtered.length === 0 ? (
-          <div className="pc p-12 text-center text-slate-500">
-            {profile.status !== "VERIFIED"
-              ? "Мэтчи появятся после верификации вашего профиля"
-              : filter
-              ? "Нет мэтчей в этой категории"
-              : "Мэтчей пока нет. Мы уведомим вас, когда появятся релевантные позиции"}
-          </div>
-        ) : (
-          <div className="space-y-4 mt-4">
-            {filtered.map((match) => (
-              <MatchCard key={match.id} match={match} />
-            ))}
-          </div>
+        {/* Interested (waiting for company) */}
+        {interestedMatches.length > 0 && (
+          <section>
+            <SectionHeader
+              title="Вы выразили интерес"
+              subtitle={`${interestedMatches.length} • ждём ответа компании`}
+            />
+            <div className="space-y-3 mt-3">
+              {interestedMatches.map((m) => (
+                <RoleCard key={m.id} match={m} pending />
+              ))}
+            </div>
+          </section>
         )}
+
+        {/* Pending (need decision) */}
+        {pendingMatches.length > 0 ? (
+          <section>
+            <SectionHeader
+              title="Подобранные роли"
+              subtitle={`${pendingMatches.length} • ждут вашей реакции`}
+            />
+            <div className="space-y-3 mt-3">
+              {pendingMatches.map((m) => (
+                <RoleCard key={m.id} match={m} />
+              ))}
+            </div>
+          </section>
+        ) : matches.length === 0 ? (
+          <EmptyState />
+        ) : null}
       </main>
     </div>
   );
 }
 
-function MatchCard({
-  match,
-}: {
+// ────────────────────────────────────────────────────────────────────
+//  Sub-components
+// ────────────────────────────────────────────────────────────────────
+
+type MatchCardProps = {
   match: {
     id: string;
     score: number;
-    scoreBreakdown: string | null;
-    status: string;
+    componentScores: unknown;
+    flags: unknown;
     candidateInterest: boolean;
-    companyInterest: boolean;
-    revealedAt: Date | null;
+    status: string;
     mandate: {
       title: string;
-      industry: string;
-      salaryMin: number;
-      salaryMax: number;
-      description: string;
-      requirements: string;
-      isAnonymous: boolean;
-      mandateType: string;
+      mainChallenge: string | null;
+      budgetRange: string | null;
+      relocationRequired: string | null;
       company: {
+        name: string | null;
         companyName: string;
-        description: string;
-        website: string | null;
-        size: string;
-        industry: string;
+        descriptionShort: string | null;
+        industryPrimary: string | null;
+        companyType: string | null;
       };
     };
   };
-}) {
-  const isMutual = match.status === "MUTUAL";
-  const alreadyInterested = match.candidateInterest;
-  const companyAlsoInterested = match.companyInterest;
-  const typeLabel = MANDATE_TYPE_LABEL[match.mandate.mandateType] ?? match.mandate.mandateType;
-  const typeColor = MANDATE_TYPE_COLOR[match.mandate.mandateType] ?? "bg-slate-100 text-slate-600";
+  mutual?: boolean;
+  pending?: boolean;
+};
 
-  const companyName = isMutual || !match.mandate.isAnonymous
-    ? match.mandate.company.companyName
-    : null;
+function RoleCard({ match, mutual, pending }: MatchCardProps) {
+  const m = match.mandate;
+  const components = (match.componentScores as ComponentScores | null) ?? null;
+  const flags = (match.flags as Flag[] | null) ?? [];
+  const company = m.company;
 
-  const scoreColor =
-    match.score >= 80 ? "text-green-600" :
-    match.score >= 60 ? "text-slate-800" :
-    match.score >= 40 ? "text-amber-600" :
-    "text-slate-400";
+  const showCompanyName = mutual;
+  const companyDisplayName = showCompanyName
+    ? (company.name ?? company.companyName ?? "Компания")
+    : `${companyTypeLabel(company.companyType)} · ${company.industryPrimary ?? "—"}`;
 
   return (
-    <div className={isMutual ? "pc-green" : "pc"}>
-      <div className="p-6">
-        {/* Header row */}
-        <div className="flex items-start gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${typeColor}`}>
-                {typeLabel}
-              </span>
-              {match.mandate.isAnonymous && !isMutual && (
-                <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium">
-                  <Lock className="w-2.5 h-2.5" />
-                  Анонимно
-                </span>
-              )}
-              {isMutual && (
-                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-100">
-                  Взаимный
-                </span>
-              )}
-            </div>
-            <h3 className="text-base font-semibold text-slate-900 leading-snug">{match.mandate.title}</h3>
-            <p className="text-sm text-slate-500 mt-0.5">
-              {companyName ?? "Компания скрыта до взаимного интереса"}
-              <span className="mx-1.5 text-slate-300">·</span>
-              {match.mandate.industry}
-            </p>
-          </div>
-          <div className="shrink-0 text-right">
-            <p className={`text-2xl font-bold tabular-nums leading-none ${scoreColor}`}>{match.score}%</p>
-            <p className="text-[10px] text-slate-400 mt-0.5">совпадение</p>
-          </div>
-        </div>
-
-        {/* Mutual reveal */}
-        {isMutual && (
-          <div className="mt-5 pt-5 border-t border-green-100 space-y-3">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-green-600" />
-              <p className="text-sm font-semibold text-green-800">Взаимный интерес — контакты открыты</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <p className="eyebrow mb-1">Компания</p>
-                <p className="text-sm font-semibold text-slate-800">{match.mandate.company.companyName}</p>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {match.mandate.company.size} · {match.mandate.company.industry}
-                </p>
-              </div>
-              {match.mandate.company.website && (
-                <div>
-                  <p className="eyebrow mb-1">Сайт</p>
-                  <a
-                    href={match.mandate.company.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-slate-700 underline underline-offset-2 hover:text-slate-900 break-all"
-                  >
-                    {match.mandate.company.website}
-                  </a>
-                </div>
-              )}
-            </div>
-            {match.mandate.company.description && (
-              <div>
-                <p className="eyebrow mb-1">О компании</p>
-                <p className="text-sm text-slate-700 leading-relaxed">{match.mandate.company.description}</p>
-              </div>
+    <div className={mutual ? "pc-green p-5" : "pc p-5"}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-mono text-slate-400 mb-1.5">
+            #{match.id.slice(-6).toUpperCase()}
+            {mutual && <Lock className="w-3 h-3 inline ml-2 text-emerald-700" />}
+          </p>
+          <h3 className="text-lg font-bold text-slate-900 leading-tight">{m.title}</h3>
+          <div className="flex flex-wrap items-center gap-2 mt-1.5">
+            <Tag icon={<Building2 className="w-3 h-3" />}>{companyDisplayName}</Tag>
+            {m.budgetRange && (
+              <Tag icon={<Wallet className="w-3 h-3" />}>
+                {COMP_LABEL[m.budgetRange] ?? m.budgetRange}
+              </Tag>
+            )}
+            {m.relocationRequired && m.relocationRequired !== "no" && (
+              <Tag icon={<MapPin className="w-3 h-3" />}>
+                Релокация: {relocationLabel(m.relocationRequired)}
+              </Tag>
             )}
           </div>
-        )}
-
-        {/* Company interest hint */}
-        {companyAlsoInterested && !isMutual && (
-          <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 text-sm text-amber-800 flex items-center gap-2">
-            <span className="text-base">🔥</span>
-            <span><strong>Компания уже отметила интерес.</strong> Отметьте взаимно, чтобы открыть контакты.</span>
-          </div>
-        )}
-
-        {/* Description */}
-        <p className="text-sm text-slate-600 leading-relaxed mt-4">{match.mandate.description}</p>
-
-        {/* Requirements */}
-        {match.mandate.requirements && (
-          <div className="mt-3 bg-slate-50 rounded-xl p-3.5">
-            <p className="eyebrow mb-1.5">Требования</p>
-            <p className="text-sm text-slate-700 leading-relaxed">{match.mandate.requirements}</p>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between gap-4">
-          <p className="text-sm font-medium text-slate-600">
-            {(match.mandate.salaryMin / 1_000_000).toFixed(1)}–
-            {(match.mandate.salaryMax / 1_000_000).toFixed(1)} млн руб/год
-          </p>
-          {!alreadyInterested && !isMutual ? (
-            <InterestButton matchId={match.id} role="candidate" />
-          ) : alreadyInterested && !isMutual ? (
-            <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-100 text-slate-500">
-              Интерес отмечен
-            </span>
-          ) : null}
         </div>
+        <OverallScoreRing score={match.score} size={84} />
+      </div>
 
-        <ScoreBreakdownWidget scoreBreakdown={match.scoreBreakdown} score={match.score} />
+      {m.mainChallenge && (
+        <div className="mt-4 p-3.5 rounded-lg bg-emerald-50 border border-emerald-200">
+          <p className="text-[10px] font-bold tracking-wider uppercase text-emerald-700 mb-1">
+            Главный вызов
+          </p>
+          <p className="text-[13.5px] text-slate-800 leading-relaxed">{m.mainChallenge}</p>
+        </div>
+      )}
+
+      {components && (
+        <div className="mt-4 space-y-1.5">
+          <ScoreBar label="Компетенции" score={components.competency} />
+          <ScoreBar label="Опыт и масштаб" score={components.trackRecord} />
+          <ScoreBar label="Личностный fit" score={components.personality} />
+          <ScoreBar label="Риск-профиль" score={components.risk} />
+          <ScoreBar
+            label="Мотивация"
+            score={components.motivational}
+            showWarning={components.motivational < 60}
+          />
+          <ScoreBar label="Культурный fit" score={components.cultural} />
+        </div>
+      )}
+
+      {flags.length > 0 && (
+        <div className="mt-4 space-y-1.5">
+          {flags.map((f, i) => (
+            <div
+              key={i}
+              className={`flex items-start gap-2 p-2.5 rounded-lg text-[12px] ${
+                f.severity === "red"
+                  ? "bg-red-50 text-red-800 border border-red-100"
+                  : "bg-amber-50 text-amber-800 border border-amber-100"
+              }`}
+            >
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+              <span className="leading-snug">{f.message}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-4 flex items-center justify-end gap-2">
+        {mutual ? (
+          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700">
+            <CheckCircle2 className="w-4 h-4" />
+            Контакты раскрыты
+          </span>
+        ) : pending ? (
+          <span className="text-sm text-slate-500 italic">Ждём ответа компании</span>
+        ) : (
+          <InterestButton matchId={match.id} role="candidate" />
+        )}
       </div>
     </div>
   );
+}
+
+function Tag({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1 text-[11px] text-slate-600 px-2 py-0.5 rounded bg-slate-100">
+      {icon}
+      {children}
+    </span>
+  );
+}
+
+function SectionHeader({
+  title,
+  subtitle,
+  accent,
+}: {
+  title: string;
+  subtitle: string;
+  accent?: "green";
+}) {
+  return (
+    <div>
+      <h2 className="text-xl font-bold tracking-tight" style={{ fontFamily: "var(--font-playfair), Georgia, serif" }}>
+        {title}
+      </h2>
+      <p
+        className={`text-xs mt-0.5 ${
+          accent === "green" ? "text-emerald-700 font-medium" : "text-slate-500"
+        }`}
+      >
+        {subtitle}
+      </p>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="pc p-8 text-center">
+      <Briefcase className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+      <h3 className="text-lg font-bold text-slate-900">Подходящих ролей пока нет</h3>
+      <p className="text-sm text-slate-600 mt-2 max-w-md mx-auto leading-relaxed">
+        Завершите все блоки опросника — это улучшит точность матчинга.
+        Также роли могут появиться, когда компании опубликуют новые мандаты.
+      </p>
+      <div className="mt-5 flex justify-center gap-3">
+        <Link
+          href="/candidate/assessment"
+          className="px-5 py-2.5 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700"
+        >
+          К опроснику
+        </Link>
+        <RescoreButton />
+      </div>
+    </div>
+  );
+}
+
+async function triggerRescore() {
+  "use server";
+  await triggerScoringForCandidate();
+}
+
+function RescoreButton() {
+  return (
+    <form action={triggerRescore}>
+      <button
+        type="submit"
+        className="px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:border-slate-300"
+      >
+        Пересчитать мэтчи
+      </button>
+    </form>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────
+//  Helpers
+// ────────────────────────────────────────────────────────────────────
+
+function companyTypeLabel(t: string | null): string {
+  switch (t) {
+    case "public": return "Публичная компания";
+    case "private": return "Частная компания";
+    case "pe_backed": return "PE-портфельная";
+    case "startup": return "Стартап";
+    case "state": return "Госкомпания";
+    case "family": return "Семейный бизнес";
+    case "jv": return "Joint Venture";
+    default: return "Компания";
+  }
+}
+
+function relocationLabel(r: string): string {
+  switch (r) {
+    case "yes": return "обязательна";
+    case "preferred": return "желательно";
+    case "hybrid_ok": return "гибрид";
+    case "remote_ok": return "remote ok";
+    default: return r;
+  }
 }

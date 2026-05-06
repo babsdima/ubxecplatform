@@ -1,3 +1,7 @@
+// GradeUp Platform — Prisma Schema
+// Phase 1: расширение схемы под questionnaire engine.
+// Старые поля помечены LEGACY — удалим в Phase 7 cleanup.
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,11 +11,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+//  USERS & AUTH
+// ═══════════════════════════════════════════════════════════════════════
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   password  String
-  role      String   @default("CANDIDATE")
+  role      String   @default("CANDIDATE") // CANDIDATE | EMPLOYER | ADMIN
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -21,41 +29,87 @@ model User {
   @@map("users")
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+//  CANDIDATE
+// ═══════════════════════════════════════════════════════════════════════
+
 model CandidateProfile {
   id     String @id @default(cuid())
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  currentTitle    String
-  industry        String
-  yearsExperience Int
-  achievements    String
-  salaryMin       Int
-  salaryMax       Int
-  locationPref    String
-  functionalFocus String
-
+  // ─── Контактные данные (общее) ────────────────────────────────────
   firstName      String?
   lastName       String?
   currentCompany String?
   phone          String?
   linkedinUrl    String?
 
+  // ─── LEGACY поля (Phase 0 → удалить в Phase 7 после миграции UI) ──
+  currentTitle      String @default("")
+  industry          String @default("")
+  yearsExperience   Int    @default(0)
+  achievements      String @default("")
+  salaryMin         Int    @default(0)
+  salaryMax         Int    @default(0)
+  locationPref      String @default("")
+  functionalFocus   String @default("")
   engagementFormats String @default("full-time")
   careerStatuses    String @default("")
   profileVisibility String @default("anonymous")
 
-  status    String  @default("PENDING")
+  // ─── E.2 — Track Record (Block E.2 структурированные факты) ───────
+  // Текущая/последняя позиция
+  currentLevel     String? // C-level | C-1 | C-2 | board
+  currentFunction  Json? // ["general_management", "finance", ...]
+  companyType      String? // public | private | pe_backed | startup | state | family | jv
+  companyRevenue   String? // <100M | 100M_500M | 500M_1B | 1B_5B | 5B_10B | 10B_50B | 50B+
+  companyEmployees String? // <50 | 50_200 | 200_1000 | 1000_5000 | 5000+
+  directReports    Int?
+  totalReports     Int?
+  pnlRange         String? // none | <500M | 500M_2B | 2B_10B | 10B+
+  tenureCurrent    String? // <1 | 1_2 | 2_4 | 4_7 | 7+
+  reasonSeeking    String? // growth | restructure | owner_change | mission_done | passive | other
+
+  // Карьерная траектория (3 предыдущие роли)
+  previousRoles Json? // [{title, company, industry, tenure, achievement}, ...]
+
+  // Агрегированные данные опыта
+  yearsManagement    Int?
+  maxPnl             String? // diapason
+  maxReports         Int?
+  industriesCount    Int?
+  industries         Json? // [industry_id, ...]
+  companyTypes       Json? // ["public", "pe_backed", ...]
+  internationalExp   Json? // ["multi_country_teams", "abroad_work", "international_hq"]
+  experienceContexts Json? // ["startup", "scale_up", "turnaround", "ma_buy", "ma_sell", "pe_integration", "ipo_pre", "digital_transformation", "geo_expansion", "restructuring", "board_work", "pe_portfolio", "state_gr"]
+
+  // Образование
+  education          Json? // [{type: "higher" | "mba" | "exec_mba" | "cert", institution, year, specialty}, ...]
+  professionalBoards Json? // membership in professional / advisory boards
+
+  // ─── Status управление платформой ─────────────────────────────────
+  status    String  @default("PENDING") // PENDING | VERIFIED | REJECTED
   adminNote String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  matches     Match[]
-  assessments Assessment[]
+  // ─── Relations ───────────────────────────────────────────────────
+  matches                Match[]
+  assessments            Assessment[] // LEGACY: Phase 7 cleanup
+  questionnaireResponses QuestionnaireResponse[]
+  scaleScore             ScaleScore?
+  preferences            CandidatePreferences?
 
   @@map("candidate_profiles")
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+//  ASSESSMENT (LEGACY — Phase 7 cleanup)
+// ═══════════════════════════════════════════════════════════════════════
+// Заменено на QuestionnaireResponse + ScaleScore. Не используется в новом
+// flow, но сохранено для compat существующего UI.
 
 model Assessment {
   id                 String           @id @default(cuid())
@@ -65,12 +119,11 @@ model Assessment {
   type   String // HOGAN | DISC | MBTI
   status String @default("NOT_TAKEN") // NOT_TAKEN | PENDING | COMPLETED
 
-  // Результаты (заполняет администратор или импортируется)
-  summary        String?
-  strengths      String?
-  risks          String?
+  summary         String?
+  strengths       String?
+  risks           String?
   leadershipStyle String?
-  rawResults     String? // JSON-строка с детальными результатами
+  rawResults      String?
 
   completedAt DateTime?
   createdAt   DateTime  @default(now())
@@ -80,40 +133,272 @@ model Assessment {
   @@map("assessments")
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+//  QUESTIONNAIRE — A, B, C, D, E.1, E.3 (новый core flow)
+// ═══════════════════════════════════════════════════════════════════════
+
+// Сырые ответы по каждому блоку. Один блок = одна запись.
+model QuestionnaireResponse {
+  id                 String           @id @default(cuid())
+  candidateProfileId String
+  candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+
+  block             String // A | B | C | D | E1 | E3
+  responses         Json // {questionId: value}
+  completionTimeSec Int?
+  completedAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([candidateProfileId, block])
+  @@map("questionnaire_responses")
+}
+
+// Нормализованные scores. Создаётся/обновляется при завершении блоков.
+model ScaleScore {
+  id                 String           @id @default(cuid())
+  candidateProfileId String           @unique
+  candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+
+  // Стенированные баллы (1-10)
+  aStens Json? // {A1: 7, A2: 6, ..., A10: 8}
+  bStens Json? // {B1: 4, B2: 3, ..., B6: 2}
+
+  // Block C — dual scoring
+  cIpsative  Json? // {ACH: 8.5, POW: 6.0, ...} (relative priorities)
+  cNormative Json? // {ACH: 7, POW: 5, ...} (absolute, sten)
+
+  // Block D
+  dCulturePct Json? // {clan: 35, adhocracy: 25, market: 30, hierarchy: 10} (sums to 100)
+  dStyle      Json? // {pace: 2.5, structure: 3, risk: 2, focus: 3.5} (1-7 scale)
+
+  // Block E.1 — forced-distribution
+  e1Distribution Json? // {top5: ["E1.01", ...], middle5: [...], bottom5: [...]}
+  e1Examples     Json? // {compId: "пример из практики", ...}
+
+  // Validity / consistency
+  validityChecks  Json? // {timeFlag, straightlineFlag, fcInconsistencies, crossBlockFlags, socialDesirabilityFlag}
+  confidenceIndex String? // high | moderate | low
+
+  normsVersion String   @default("MVP-v1")
+  scoredAt     DateTime @default(now())
+
+  @@map("scale_scores")
+}
+
+// Карьерные предпочтения (Block E.3)
+model CandidatePreferences {
+  id                 String           @id @default(cuid())
+  candidateProfileId String           @unique
+  candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+
+  // Активность и готовность
+  activityStatus String? // active | open | passive | not_available
+  readiness      String? // immediate | 1_month | 2_3_months | 3_6_months | 6_plus
+
+  // Целевые параметры
+  targetRoles        Json? // ["CFO", "COO", "CEO", ...]
+  targetIndustries   Json? // [industry_id, ...]
+  targetCompanyTypes Json? // ["public", "pe_backed", "startup", ...]
+  targetRevenue      Json? // ["1B_5B", "5B_10B"]
+  geography          Json? // ["moscow", "spb", "regions_rf", "cis", "international", "remote"]
+  relocation         String? // ready | discuss | not_ready
+
+  // Компенсация
+  totalCashRange   String? // 5_10M | 10_15M | 15_25M | 25_40M | 40_60M | 60M+
+  equityImportance String? // critical | desirable | not_important
+  minFixedRange    String?
+
+  // Deal-breakers и приоритеты
+  dealbreakers   Json? // ["sanctioned", "government", ...]
+  top3Priorities Json? // ranked: ["scale_pnl", "autonomy", "team_culture"]
+
+  updatedAt DateTime @updatedAt
+
+  @@map("candidate_preferences")
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  COMPANY PROFILE (CP.1–CP.8)
+// ═══════════════════════════════════════════════════════════════════════
+
 model CompanyProfile {
   id     String @id @default(cuid())
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  companyName String
-  industry    String
-  size        String
-  description String
+  // ─── LEGACY поля (Phase 0 → удалить в Phase 7) ────────────────────
+  companyName String  @default("")
+  industry    String  @default("")
+  size        String  @default("")
+  description String  @default("")
   website     String?
   isVerified  Boolean @default(false)
+
+  // ─── CP.1 — Идентификация ─────────────────────────────────────────
+  name        String? // публичное название (зеркало companyName)
+  legalEntity String? // ИНН/ОГРН
+  logoUrl     String?
+  yearFounded Int?
+
+  descriptionShort String? // elevator pitch, max 300 chars
+  descriptionFull  String? // max 1500 chars
+  mainProduct      String? // max 200 chars
+
+  industryPrimary     String? // FK to Industry.id (nullable for migration)
+  industriesSecondary Json? // [industry_id, ...]
+  companyType         String? // public | private | pe_backed | startup | state | family | jv
+  b2bB2c              String? // B2B | B2C | B2B2C
+
+  // CP.1.3 — Масштаб
+  revenueRange  String? // <100M | 100M_500M | ... | 50B+
+  ebitdaRange   String? // unprofitable | 0_10 | 10_20 | 20_30 | 30+ | undisclosed
+  employeeCount String?
+  geography     Json? // ["moscow", "spb", "regions_rf", "cis", "international"]
+  hqCity        String?
+  officeCount   Int?
+
+  // CP.1.4 — Акционерная (confidential)
+  ownershipType  String? // single_founder | partners | institutional | public | state | family | mixed
+  ownershipDesc  String? // max 300
+  sanctionStatus String? // none | restricted
+
+  // ─── CP.2 — Стадия и контекст ─────────────────────────────────────
+  stage            String? // pre_revenue | early_growth | scale_up | mature | transformation | turnaround | pre_exit | post_ma
+  growthChallenges Json? // {top3: [...], all: [...]}
+  revenueGrowth    String? // decline | 0_10 | 10_25 | 25_50 | 50_100 | 100+
+  staffGrowth      String?
+  growthPlan       String? // decline | stable | moderate | aggressive
+
+  // ─── CP.3 — Культурный профиль ────────────────────────────────────
+  cultureAsIs     Json? // {clan: 30, adhocracy: 20, market: 30, hierarchy: 20} (sums to 100)
+  cultureToBe     Json?
+  workingStyle    Json? // {pace: 3, structure: 5, risk: 4, focus: 4.5} (1-7 scale)
+  culturalMarkers Json? // ["flat_structure", "data_driven", ...] (5-8 selected from ~20)
+
+  // ─── CP.4 — Стиль лидерства ───────────────────────────────────────
+  leadershipStyleRanking Json? // [["visionary", 1], ["coaching", 2], ...]
+  leaderExpectationsTop3 Json? // ["first_100_days_wins", "team_building", ...]
+
+  // ─── CP.5 — Среда и условия ───────────────────────────────────────
+  workFormat           String? // office | hybrid_2_3 | hybrid_1 | remote_first | remote
+  travelFrequency      String? // none | rare | moderate | frequent | very_frequent
+  compPositioning      String? // below_market | at_market | above_market | leader
+  compStructure        Json?
+  benefits             Json?
+  hiringDecisionMakers Json?
+  hiringProcess        String?
+  hiringTimeline       String?
+  onboardingStyle      String?
+
+  // ─── CP.6 — Ценности и EVP ────────────────────────────────────────
+  values           Json? // [{name, description}, ...]
+  evp              String? // max 500
+  honestChallenges String? // max 500, confidential
+
+  // ─── CP.7 — Команда руководства (confidential) ────────────────────
+  cLevelTeam    Json? // [{role, filled, tenure, source}, ...]
+  teamFormation String?
+  teamTurnover  String?
+  teamDynamics  Json?
+
+  // ─── CP.8 — Confidentiality defaults ──────────────────────────────
+  showName           Boolean @default(false)
+  codename           String?
+  showLogo           Boolean @default(false)
+  visibleToUserIds   Json?
+  notifyRejected     Boolean @default(true)
+  assessorAccessTeam Boolean @default(true)
+
+  // ─── Service fields ────────────────────────────────────────────────
+  profileCompletion Int @default(0) // 0-100%
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // ─── Relations ─────────────────────────────────────────────────────
   mandates Mandate[]
 
   @@map("company_profiles")
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+//  MANDATE (вакансия / Role Profile R.1–R.7)
+// ═══════════════════════════════════════════════════════════════════════
+// Сохраняем имя `Mandate` (отраслевой термин в executive search).
+// В UI можно использовать слово «Вакансия».
 
 model Mandate {
   id        String         @id @default(cuid())
   companyId String
   company   CompanyProfile @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  title        String
-  industry     String
-  salaryMin    Int
-  salaryMax    Int
-  description  String
-  requirements String
+  // ─── LEGACY поля (Phase 0 → удалить в Phase 7) ────────────────────
+  industry     String  @default("")
+  salaryMin    Int     @default(0)
+  salaryMax    Int     @default(0)
+  description  String  @default("")
+  requirements String  @default("")
   isAnonymous  Boolean @default(false)
   mandateType  String  @default("full-time")
-  status       String  @default("DRAFT")
+
+  // ─── R.1.2 — О роли ───────────────────────────────────────────────
+  title                   String // human-readable position
+  level                   String? // CEO | C-level | C-1 | board | interim
+  function                Json? // ["general_management", "finance", "operations", ...]
+  isNewRole               Boolean? // true = new, false = replacement
+  reportsTo               String? // ceo | board | shareholder | managing_director | regional | other
+  directReports           Int?
+  totalTeam               Int?
+  pnlRange                String?
+  geographyResponsibility Json?
+  relocationRequired      String? // yes | preferred | no | hybrid_ok | remote_ok
+  travelPct               String? // <10 | 10_30 | 30_50 | >50
+
+  // ─── R.1.3 — Компенсация ──────────────────────────────────────────
+  budgetRange     String? // 5_10M | 10_15M | ...
+  budgetStructure String? // 80_20 | 70_30 | ... | flexible
+  equityAvailable String? // significant | small | none | discuss
+  compFlexibility String? // strict | within_15 | open
+
+  // ─── R.1.4 — Контекст и вызовы ────────────────────────────────────
+  mainChallenge String? // max 500
+  keyTasks      Json? // [{task: "...", rank: 1}, ...]
+  openingReason String? // growth_new | predecessor_left | predecessor_fired | restructure | other
+
+  // ─── R.1.5 — Hard filters ─────────────────────────────────────────
+  hardFilters Json? // {min_years, min_pnl, required_industries, required_contexts, international_required, mba_required, languages}
+
+  // ─── R.2 — Компетенции ────────────────────────────────────────────
+  competencyMustHave   Json? // [comp_id, ...] top 5
+  competencyImportant  Json? // middle 5
+  competencyNiceToHave Json? // bottom 5
+  competencyContexts   Json? // {comp_id: "why text"}
+
+  // ─── R.3 — Personality preferences ────────────────────────────────
+  personalityPrefs Json? // {A1: "high", A2: "moderate", ..., A10: "high"}
+
+  // ─── R.4 — Risk tolerance ─────────────────────────────────────────
+  riskTolerance Json? // {B1: "zero", B2: "zero", ..., B6: "low"}
+
+  // ─── R.5 — Мотивация ──────────────────────────────────────────────
+  motivationTop3    Json? // ["ACH", "POW", "AUT"]
+  motivationMiddle3 Json?
+  motivationBottom2 Json?
+
+  // ─── R.6 — Culture (overrides; null = inherit from CompanyProfile) ─
+  cultureToBeOverride Json?
+  styleOverride       Json?
+
+  // ─── R.7 — Доп. контекст ──────────────────────────────────────────
+  idealCandidateText       String? // max 1000
+  antiProfileText          String? // max 500
+  confidentialityOverrides Json?
+
+  // ─── Service ──────────────────────────────────────────────────────
+  status       String  @default("DRAFT") // DRAFT | ACTIVE | PAUSED | CLOSED | FILLED
+  templateUsed String? // "ceo_growth" | "cfo_pe_backed" | ...
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -123,6 +408,10 @@ model Mandate {
   @@map("mandates")
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+//  MATCH (кандидат × мандат с component scoring)
+// ═══════════════════════════════════════════════════════════════════════
+
 model Match {
   id                 String           @id @default(cuid())
   mandateId          String
@@ -130,16 +419,99 @@ model Match {
   candidateProfileId String
   candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
 
-  score          Int
-  scoreBreakdown String?  // JSON: { industry, role, salary, experience, format, location, assessment }
-  status            String   @default("PENDING")
-  candidateInterest Boolean  @default(false)
-  companyInterest   Boolean  @default(false)
+  // ─── Scoring ──────────────────────────────────────────────────────
+  score          Int // 0-100 overall match (новый weighted)
+  // LEGACY: scoreBreakdown (старый формат). Phase 7 cleanup.
+  scoreBreakdown String? // JSON-string легаси формата
+
+  // Новый формат:
+  componentScores Json? // {competency: 87, trackRecord: 79, personality: 85, risk: 91, motivational: 56, cultural: 82}
+  flags           Json? // [{severity: "warning"|"info", scale: "B5", message: "..."}]
+  matchLabel      String? // strong | good | conditional | weak | mismatch
+  scoredAt        DateTime?
+
+  // ─── Interest workflow ────────────────────────────────────────────
+  status            String    @default("PENDING") // PENDING | MUTUAL | REJECTED | IN_PROCESS | HIRED
+  candidateInterest Boolean   @default(false)
+  companyInterest   Boolean   @default(false)
   revealedAt        DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // ─── Feedback (через 90/180/365 дней для ML calibration) ──────────
+  feedback MatchFeedback[]
+
   @@unique([mandateId, candidateProfileId])
   @@map("matches")
+}
+
+model MatchFeedback {
+  id      String @id @default(cuid())
+  matchId String
+  match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  fromRole  String // candidate | company
+  stage     String // post_match | post_interview | 90_day | 6_month | 12_month
+  rating    Int // 1-5
+  comments  String?
+  createdAt DateTime @default(now())
+
+  @@map("match_feedback")
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  REFERENCE DATA (справочники)
+// ═══════════════════════════════════════════════════════════════════════
+
+// 15 управленческих компетенций (E.1)
+model Competency {
+  id                String  @id // "E1.01" .. "E1.15"
+  code              String  @unique
+  domain            String // strategic | people | execution | personal
+  nameRu            String
+  nameEn            String?
+  description       String // Определение для кандидата
+  behavioralAnchors Json // {low: "...", mid: "...", high: "..."}
+  lominger          Json? // mapping references (e.g. ["#58 Strategic Agility", "#65 Managing Vision"])
+  ddiMapping        String?
+  order             Int
+
+  @@map("competencies")
+}
+
+// Справочник отраслей
+model Industry {
+  id       String  @id // "tech" | "fintech" | ...
+  nameRu   String
+  nameEn   String?
+  category String? // tech | finance | industrial | retail | services | ...
+  order    Int
+
+  @@map("industries")
+}
+
+// Pre-filled шаблоны для R.1–R.7
+model RoleTemplate {
+  id      String @id // "ceo_growth" | "cfo_pe_backed" | ...
+  role    String // CEO | CFO | CTO | COO | CHRO
+  context String // growth | turnaround | pe_backed | corporate | startup
+  nameRu  String
+
+  competencyMustHave   Json
+  competencyImportant  Json
+  competencyNiceToHave Json
+
+  personalityPrefs  Json
+  riskTolerance     Json
+  motivationTop3    Json
+  motivationMiddle3 Json
+  motivationBottom2 Json
+
+  cultureProfile Json?
+  styleDefaults  Json?
+
+  description String?
+
+  @@map("role_templates")
 }
